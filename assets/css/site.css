@@ -1,5 +1,5 @@
 /* ==========================================================================
-   peplomer. Research at the seam between wetware and weights.
+   peplomer. Research at the seam between neurons and weights.
    One stylesheet. Light mode only. Every value is a token.
    ========================================================================== */
 
@@ -230,6 +230,10 @@ main { display: block; }
 .section-head p { color: var(--muted); font-size: var(--step-meta); font-family: var(--mono); margin: 0; }
 
 .index { border-top: 1px solid var(--hairline); }
+.index-sub { display: flex; align-items: center; gap: .8rem; font-family: var(--mono); font-size: var(--step-micro); text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: var(--s6) 0 0; padding-top: var(--s4); border-top: 1px solid var(--hairline); }
+.index-sub:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.index-sub::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+.index-sub[hidden] { display: none; }
 .entry {
   display: grid; grid-template-columns: 12px 1fr auto; gap: var(--s4);
   align-items: start; padding: var(--s4) var(--s3); border-bottom: 1px solid var(--hairline);
@@ -249,8 +253,7 @@ main { display: block; }
 .entry__claim { display: block; font-family: var(--display); font-size: var(--step-h3); line-height: 1.2; letter-spacing: -.01em; font-weight: 400; color: var(--ink); }
 .entry:hover .entry__claim { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .entry__desc { display: block; color: var(--muted); font-size: 1.02rem; margin-top: .35rem; line-height: 1.5; max-width: 60ch; }
-.entry__meta { text-align: right; font-family: var(--mono); font-size: var(--step-caption); color: var(--muted); white-space: nowrap; }
-.entry__meta .fid { display: inline-block; margin-top: .4rem; }
+.entry__meta { display: flex; flex-direction: column; align-items: flex-end; gap: .45rem; font-family: var(--mono); font-size: var(--step-caption); color: var(--muted); white-space: nowrap; }
 .entry__arrow { position: absolute; right: 0; top: var(--s4); opacity: 0; transition: opacity .15s, transform .15s; }
 @media (prefers-reduced-motion: no-preference) { .entry:hover .entry__arrow { opacity: 1; transform: translateX(3px); } }
 
@@ -259,6 +262,18 @@ main { display: block; }
 .fid--mechanism { color: var(--blue-ink); border-color: var(--blue); }
 .fid--analogy { color: var(--yellow-ink); border-color: var(--yellow); }
 .fid--metaphor { color: var(--red-ink); border-color: var(--red); }
+
+/* Depth meter tag: three rising bars, filled by level. Neutral ink so it
+   never competes with the side accents or the fidelity chips. */
+.depth { display: inline-flex; align-items: center; gap: .4rem; font-family: var(--mono); font-size: var(--step-micro); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.depth__meter { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+.depth__meter i { width: 3px; background: var(--hairline-strong); border-radius: .5px; }
+.depth__meter i:nth-child(1) { height: 4px; }
+.depth__meter i:nth-child(2) { height: 7px; }
+.depth__meter i:nth-child(3) { height: 11px; }
+.depth--primer .depth__meter i:nth-child(1) { background: var(--ink); }
+.depth--core .depth__meter i:nth-child(-n+2) { background: var(--ink); }
+.depth--deep .depth__meter i { background: var(--ink); }
 
 /* ==========================================================================
    Research filter
@@ -269,12 +284,18 @@ main { display: block; }
   background: transparent; border: 1px solid var(--hairline); border-radius: 2px;
   padding: .4rem .8rem; cursor: pointer; display: inline-flex; align-items: center; gap: .5rem;
 }
-.filter button i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: .55; }
+.filter button > i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: .55; }
 .filter button:hover { color: var(--ink); border-color: var(--hairline-strong); }
 .filter button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); }
 .filter button.f-bio[aria-pressed="true"] { color: var(--blue-ink); border-color: var(--blue-ink); }
 .filter button.f-comp[aria-pressed="true"] { color: var(--red-ink); border-color: var(--red-ink); }
 .filter button.f-bridge[aria-pressed="true"] { color: var(--yellow-ink); border-color: var(--yellow-ink); }
+/* two filter groups: side and depth */
+.filters { display: flex; flex-wrap: wrap; gap: var(--s5); margin-bottom: var(--s6); align-items: flex-start; }
+.filter-group { display: flex; flex-direction: column; gap: .65rem; }
+.filter-group__label { font-family: var(--mono); font-size: var(--step-micro); text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.filter-group .filter { margin-bottom: 0; }
+.filter button .depth__meter { height: 10px; }
 .entry[hidden] { display: none; }
 .empty-state { display: none; padding: var(--s5) 0; color: var(--muted); font-family: var(--mono); font-size: var(--step-meta); }
 .empty-state.on { display: block; }
@@ -410,6 +431,29 @@ figure.fig figcaption b { color: var(--ink); font-weight: 500; }
 }
 @media (prefers-reduced-motion: reduce) { .term > .term__def { transition: none; } }
 
+/* ---- Primer components (centered column, callout, read-next) -------------- */
+.prose--centered { margin-left: auto; margin-right: auto; }
+.callout {
+  border: 1px solid var(--accent); border-left: 3px solid var(--accent);
+  background: var(--accent-wash); border-radius: var(--radius);
+  padding: var(--s4); margin: var(--s5) 0; max-width: var(--measure);
+}
+.callout .label { display: block; margin-bottom: var(--s2); color: var(--accent-ink); }
+.callout p { margin: 0; font-size: 1.08rem; line-height: 1.5; }
+.callout p + p { margin-top: var(--s2); }
+
+.readnext {
+  display: block; text-decoration: none; color: inherit; max-width: var(--measure);
+  border: 1px solid var(--hairline); border-left: 3px solid var(--accent);
+  border-radius: var(--radius); padding: var(--s4); margin-top: var(--s6);
+  transition: border-color .18s ease, background-color .18s ease;
+}
+.readnext:hover { border-color: var(--hairline-strong); background: var(--surface); }
+.readnext .label { display: block; margin-bottom: .35rem; color: var(--muted); }
+.readnext__title { font-family: var(--display); font-size: var(--step-h3); line-height: 1.2; color: var(--ink); }
+.readnext:hover .readnext__title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.readnext__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: .5rem; font-family: var(--mono); font-size: var(--step-caption); color: var(--muted); }
+
 /* Article footer nav */
 .article-foot { border-top: 1px solid var(--hairline); margin-top: var(--s6); padding-top: var(--s5); display: flex; justify-content: space-between; gap: var(--s4); flex-wrap: wrap; }
 .article-foot a { text-decoration: none; font-family: var(--mono); font-size: var(--step-meta); color: var(--muted); }
@@ -471,8 +515,7 @@ figure.fig figcaption b { color: var(--ink); font-weight: 500; }
 @media (max-width: 40rem) {
   .nav { gap: var(--s3); }
   .entry { grid-template-columns: 4px 1fr; }
-  .entry__meta { grid-column: 2; text-align: left; margin-top: .5rem; display: flex; gap: var(--s3); align-items: center; }
-  .entry__meta .fid { margin-top: 0; }
+  .entry__meta { grid-column: 2; align-items: center; margin-top: .5rem; flex-direction: row; flex-wrap: wrap; gap: var(--s3); }
   .entry__arrow { display: none; }
   .site-foot__row { grid-template-columns: 1fr; gap: var(--s4); }
   /* Correspondence table: stack into records on narrow screens */

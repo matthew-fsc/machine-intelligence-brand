@@ -28,7 +28,7 @@ favicon.svg                        the virus mark, flat single colour
 
 One structural choice runs site-wide: a fixed accent legend.
 
-- **blue**: the biological side (neuroscience, behavior, wetware)
+- **blue**: the biological side (neuroscience, behavior, the brain)
 - **red**: the computational side (models, training, architecture)
 - **yellow**: the bridge, appearing only where a correspondence is asserted
 

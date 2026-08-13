@@ -49,28 +49,43 @@
     }
   }
 
-  /* -- 2. Research filter ------------------------------------------------- */
+  /* -- 2. Research filter: two dimensions, side and depth (AND logic) ------ */
   var filter = document.querySelector("[data-filter]");
   if (filter) {
-    var buttons = filter.querySelectorAll("button[data-side]");
+    var sideButtons = filter.querySelectorAll("button[data-side]");
+    var depthButtons = filter.querySelectorAll("button[data-depth]");
     var entries = document.querySelectorAll("[data-entry]");
+    var groups = document.querySelectorAll("[data-group]");
     var empty = document.querySelector("[data-empty]");
-    function apply(side) {
+    var state = { side: "all", depth: "all" };
+    function apply() {
       var shown = 0;
       entries.forEach(function (el) {
-        var match = side === "all" || el.getAttribute("data-side") === side;
+        var okSide = state.side === "all" || el.getAttribute("data-side") === state.side;
+        var okDepth = state.depth === "all" || el.getAttribute("data-depth") === state.depth;
+        var match = okSide && okDepth;
         el.hidden = !match;
         if (match) shown++;
       });
-      buttons.forEach(function (b) {
-        b.setAttribute("aria-pressed", String(b.getAttribute("data-side") === side));
+      sideButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-side") === state.side)); });
+      depthButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-depth") === state.depth)); });
+      // hide a group subhead when it has no visible entries under it
+      groups.forEach(function (h) {
+        var d = h.getAttribute("data-group");
+        var any = Array.prototype.some.call(entries, function (el) {
+          return !el.hidden && el.getAttribute("data-depth") === d;
+        });
+        h.hidden = !any;
       });
       if (empty) empty.classList.toggle("on", shown === 0);
     }
-    buttons.forEach(function (b) {
-      b.addEventListener("click", function () { apply(b.getAttribute("data-side")); });
+    sideButtons.forEach(function (b) {
+      b.addEventListener("click", function () { state.side = b.getAttribute("data-side"); apply(); });
     });
-    apply("all");
+    depthButtons.forEach(function (b) {
+      b.addEventListener("click", function () { state.depth = b.getAttribute("data-depth"); apply(); });
+    });
+    apply();
   }
 
   /* -- 3. TOC scrollspy --------------------------------------------------- */
