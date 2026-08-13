@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>peplomer: research at the seam of wetware and weights</title>
+  <title>peplomer: research at the seam of neurons and weights</title>
   <meta name="description" content="A research and learning publication mapping neuroscience and behavioral science onto machine learning, prompt engineering, and agentic architecture, and saying where the map is wrong.">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="peplomer: research at the seam of wetware and weights">
+  <meta property="og:title" content="peplomer: research at the seam of neurons and weights">
   <meta property="og:description" content="Essays mapping neuroscience onto machine learning, with the fidelity of every analogy stated plainly.">
   <meta property="og:site_name" content="peplomer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,42 +50,77 @@
 
   <main id="main">
     <!-- HERO -->
-    <section class="hero wrap" aria-labelledby="thesis">
-      <div class="hero__grid">
-        <div class="hero__thesis">
-          <h1 id="thesis">the seam between <em>wetware</em> and <em>weights</em></h1>
-          <p class="hero__sub">Essays that map the brain onto the model, hold each analogy to a fidelity rating, and mark exactly where the map stops being true.</p>
-          <div class="hero__legend" aria-label="accent legend">
-            <span class="legend-key k-bio"><i></i> blue, the biological side</span>
-            <span class="legend-key k-comp"><i></i> red, the computational side</span>
-            <span class="legend-key k-bridge"><i></i> yellow, a claimed correspondence</span>
-          </div>
+    <section class="hero" aria-labelledby="thesis">
+      <div class="hero__inner wrap">
+        <!-- Large accent virus mark: the one bold moment. Left spikes blue
+             (biological), right spikes red (computational), top spike yellow
+             (the bridge): the site's structural device encoded in the mark. -->
+        <svg class="hero__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="none" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" stroke="#BFBEB6"/>
+            <circle cx="32" cy="32" r="4" fill="#BFBEB6" stroke="none"/>
+            <g stroke="#E6CE83" fill="#E6CE83"><line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.4" stroke="none"/></g>
+            <g stroke="#D3D2CB" fill="#D3D2CB"><line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.4" stroke="none"/></g>
+            <g stroke="#E4A9A2" fill="#E4A9A2"><line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.4" stroke="none"/></g>
+            <g stroke="#E4A9A2" fill="#E4A9A2"><line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.4" stroke="none"/></g>
+            <g stroke="#E4A9A2" fill="#E4A9A2"><line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.4" stroke="none"/></g>
+            <g stroke="#D3D2CB" fill="#D3D2CB"><line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.4" stroke="none"/></g>
+            <g stroke="#D3D2CB" fill="#D3D2CB"><line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.4" stroke="none"/></g>
+            <g stroke="#D3D2CB" fill="#D3D2CB"><line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.4" stroke="none"/></g>
+            <g stroke="#9DBFE0" fill="#9DBFE0"><line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.4" stroke="none"/></g>
+            <g stroke="#9DBFE0" fill="#9DBFE0"><line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.4" stroke="none"/></g>
+            <g stroke="#9DBFE0" fill="#9DBFE0"><line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.4" stroke="none"/></g>
+            <g stroke="#D3D2CB" fill="#D3D2CB"><line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.4" stroke="none"/></g>
+          </g>
+        </svg>
+
+        <div class="hero__top">
+          <p class="hero__eyebrow mono">research at the seam · behavioral science ↔ machine learning</p>
+          <h1 id="thesis">the seam between <em>neurons</em> and <em>weights</em></h1>
         </div>
 
-        <!-- Signature: live correspondence diagram -->
+        <div class="hero__row">
+          <div class="hero__meta">
+            <p class="hero__sub">Essays that map the brain onto the model, hold each analogy to a fidelity rating, and mark exactly where the map stops being true.</p>
+            <div class="hero__legend" aria-label="accent legend">
+              <span class="legend-key k-bio"><i></i> blue, the biological side</span>
+              <span class="legend-key k-comp"><i></i> red, the computational side</span>
+              <span class="legend-key k-bridge"><i></i> yellow, a claimed correspondence</span>
+            </div>
+          </div>
+
+        <!-- Signature: live correspondence diagram, drawn as an instrument readout -->
         <figure class="corr" data-corr aria-label="A rotating diagram of correspondences between a neuroscience concept and a machine-learning concept.">
-          <figcaption class="corr__tag">correspondence · live</figcaption>
-          <svg class="corr__svg" viewBox="0 0 420 190" role="img" aria-hidden="true">
+          <figcaption class="corr__tag"><span class="corr__pulse" aria-hidden="true"></span> correspondence · live</figcaption>
+          <svg class="corr__svg" viewBox="0 0 420 200" role="img" aria-hidden="true">
+            <!-- baseline scale ticks, the instrument feel -->
+            <g stroke="#D7D6D0" stroke-width="1">
+              <line x1="30" y1="176" x2="390" y2="176"/>
+              <line x1="30" y1="172" x2="30" y2="180"/><line x1="120" y1="173" x2="120" y2="179"/>
+              <line x1="210" y1="172" x2="210" y2="180"/><line x1="300" y1="173" x2="300" y2="179"/>
+              <line x1="390" y1="172" x2="390" y2="180"/>
+            </g>
             <!-- bridge -->
-            <path class="corr__bridge-path" d="M150 95 H270" fill="none" stroke="#E6CE83" stroke-width="3"/>
-            <circle cx="210" cy="95" r="4.5" fill="#E6CE83"/>
+            <path class="corr__bridge-path" d="M148 96 H272" fill="none" stroke="#E6CE83" stroke-width="3"/>
+            <circle class="corr__bridge-dot" cx="210" cy="96" r="5" fill="#E6CE83"/>
             <!-- bio node (left) -->
-            <circle cx="95" cy="95" r="52" fill="rgba(157,191,224,.14)" stroke="#9DBFE0" stroke-width="1.5"/>
-            <circle cx="95" cy="95" r="7" fill="#9DBFE0"/>
+            <circle class="corr__node corr__node--bio" cx="94" cy="96" r="54" fill="rgba(157,191,224,.14)" stroke="#9DBFE0" stroke-width="1.5"/>
+            <circle cx="94" cy="96" r="7" fill="#9DBFE0"/>
             <!-- comp node (right) -->
-            <rect x="273" y="52" width="104" height="86" rx="4" fill="rgba(228,169,162,.16)" stroke="#E4A9A2" stroke-width="1.5"/>
-            <rect x="321" y="90" width="10" height="10" fill="#E4A9A2"/>
-            <text x="95" y="163" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#35597F">neuroscience</text>
-            <text x="325" y="163" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#A63A30">machine learning</text>
+            <rect class="corr__node corr__node--comp" x="274" y="52" width="104" height="88" rx="4" fill="rgba(228,169,162,.16)" stroke="#E4A9A2" stroke-width="1.5"/>
+            <rect x="321" y="91" width="10" height="10" fill="#E4A9A2"/>
+            <text x="94" y="166" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#35597F">neuroscience</text>
+            <text x="326" y="166" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#A63A30">machine learning</text>
           </svg>
           <div class="corr__readout">
             <span class="corr__pair"><b data-corr-bio>predictive processing</b> <span aria-hidden="true">·</span> <span data-corr-note>both minimise a prediction error, but for different reasons</span> <span aria-hidden="true">·</span> <b data-corr-comp>next-token prediction</b></span>
           </div>
-          <div class="corr__readout" style="border-top:none;padding-top:.4rem;margin-top:0;">
+          <div class="corr__readout corr__readout--fid">
             <span class="corr__pair label">fidelity</span>
             <span class="fidelity fidelity--analogy" data-corr-fid>analogy</span>
           </div>
         </figure>
+        </div>
       </div>
     </section>
 
@@ -93,62 +128,121 @@
     <section class="section wrap" aria-labelledby="reading">
       <div class="section-head">
         <h2 id="reading">reading index</h2>
-        <p>five essays · sorted by publication</p>
+        <p>ten pieces · start with the primers</p>
       </div>
       <div class="index">
 
-        <a class="entry side-bio reveal" data-entry data-side="bio" href="research/predictive-processing.html">
+        <p class="index-sub">start here · primers</p>
+
+        <a class="entry side-bridge reveal" data-entry data-side="bridge" data-depth="primer" href="research/what-is-peplomer.html">
           <span class="entry__side" aria-hidden="true"></span>
           <span class="entry__body">
-            <span class="entry__eyebrow"><span class="no">01</span> · biological · predictive coding</span>
+            <span class="entry__eyebrow">the bridge · start here</span>
+            <span class="entry__claim">What peplomer is</span>
+            <span class="entry__desc">A short guide to a publication that puts the brain and the machine side by side, rates how far each comparison holds, and says where it breaks.</span>
+          </span>
+          <span class="entry__meta"><span>4 min</span><span class="depth depth--primer"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> primer</span></span>
+          <span class="entry__arrow mono" aria-hidden="true">→</span>
+        </a>
+
+        <a class="entry side-bridge reveal" data-entry data-side="bridge" data-depth="primer" href="research/the-three-sides.html">
+          <span class="entry__side" aria-hidden="true"></span>
+          <span class="entry__body">
+            <span class="entry__eyebrow">the bridge · start here</span>
+            <span class="entry__claim">The three sides: biological, computational, and the bridge</span>
+            <span class="entry__desc">Three colours carry the whole argument. Blue is a claim about brains, red about machines, and yellow a claim that the two line up.</span>
+          </span>
+          <span class="entry__meta"><span>5 min</span><span class="depth depth--primer"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> primer</span></span>
+          <span class="entry__arrow mono" aria-hidden="true">→</span>
+        </a>
+
+        <a class="entry side-bridge reveal" data-entry data-side="bridge" data-depth="primer" href="research/how-to-read-a-correspondence.html">
+          <span class="entry__side" aria-hidden="true"></span>
+          <span class="entry__body">
+            <span class="entry__eyebrow">the bridge · start here</span>
+            <span class="entry__claim">How to read a correspondence</span>
+            <span class="entry__desc">Every brain-to-machine claim gets one of three words, mechanism, analogy, or metaphor, and a paragraph saying where it stops being true.</span>
+          </span>
+          <span class="entry__meta"><span>4 min</span><span class="depth depth--primer"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> primer</span></span>
+          <span class="entry__arrow mono" aria-hidden="true">→</span>
+        </a>
+
+        <a class="entry side-bio reveal" data-entry data-side="bio" data-depth="primer" href="research/the-predicting-brain.html">
+          <span class="entry__side" aria-hidden="true"></span>
+          <span class="entry__body">
+            <span class="entry__eyebrow">biological · the brain</span>
+            <span class="entry__claim">The predicting brain, in plain terms</span>
+            <span class="entry__desc">Your brain is not waiting for the world to report in. It is guessing constantly, and paying attention mostly to what it got wrong.</span>
+          </span>
+          <span class="entry__meta"><span>5 min</span><span class="depth depth--primer"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> primer</span></span>
+          <span class="entry__arrow mono" aria-hidden="true">→</span>
+        </a>
+
+        <a class="entry side-comp reveal" data-entry data-side="comp" data-depth="primer" href="research/how-a-model-learns.html">
+          <span class="entry__side" aria-hidden="true"></span>
+          <span class="entry__body">
+            <span class="entry__eyebrow">computational · the machine</span>
+            <span class="entry__claim">How a language model learns, in plain terms</span>
+            <span class="entry__desc">Trained to do one narrow thing, guess the next word, billions of times, until the guessing encodes a great deal about the world.</span>
+          </span>
+          <span class="entry__meta"><span>5 min</span><span class="depth depth--primer"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> primer</span></span>
+          <span class="entry__arrow mono" aria-hidden="true">→</span>
+        </a>
+
+        <p class="index-sub">essays · core and deep dives</p>
+
+        <a class="entry side-bio reveal" data-entry data-side="bio" data-depth="core" href="research/predictive-processing.html">
+          <span class="entry__side" aria-hidden="true"></span>
+          <span class="entry__body">
+            <span class="entry__eyebrow">biological · predictive coding</span>
             <span class="entry__claim">Predictive processing and the prediction objective</span>
             <span class="entry__desc">A brain that minimises surprise and a model that minimises next-token loss are both prediction machines. The resemblance is real, and partly notational.</span>
           </span>
-          <span class="entry__meta">14 min<br><span class="fid fid--analogy">analogy</span></span>
+          <span class="entry__meta"><span>14 min</span><span class="depth depth--core"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> core</span><span class="fid fid--analogy">analogy</span></span>
           <span class="entry__arrow mono" aria-hidden="true">→</span>
         </a>
 
-        <a class="entry side-comp reveal" data-entry data-side="comp" href="research/dual-process-reasoning.html">
+        <a class="entry side-comp reveal" data-entry data-side="comp" data-depth="core" href="research/dual-process-reasoning.html">
           <span class="entry__side" aria-hidden="true"></span>
           <span class="entry__body">
-            <span class="entry__eyebrow"><span class="no">02</span> · computational · reasoning traces</span>
+            <span class="entry__eyebrow">computational · reasoning traces</span>
             <span class="entry__claim">Dual-process theory, metacognition, and the reasoning trace</span>
             <span class="entry__desc">Chain of thought looks like System 2 stepping in. It is produced by the same forward pass as everything else, and the trace can be unfaithful to the cause of the answer.</span>
           </span>
-          <span class="entry__meta">16 min<br><span class="fid fid--metaphor">metaphor</span></span>
+          <span class="entry__meta"><span>16 min</span><span class="depth depth--core"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> core</span><span class="fid fid--metaphor">metaphor</span></span>
           <span class="entry__arrow mono" aria-hidden="true">→</span>
         </a>
 
-        <a class="entry side-bio reveal" data-entry data-side="bio" href="research/consolidation-replay-memory.html">
+        <a class="entry side-bio reveal" data-entry data-side="bio" data-depth="core" href="research/consolidation-replay-memory.html">
           <span class="entry__side" aria-hidden="true"></span>
           <span class="entry__body">
-            <span class="entry__eyebrow"><span class="no">03</span> · biological · memory systems</span>
+            <span class="entry__eyebrow">biological · memory systems</span>
             <span class="entry__claim">Consolidation, replay, and agent memory architecture</span>
             <span class="entry__desc">Hippocampal replay and neocortical consolidation next to retrieval, summarization, and distillation from trajectories. Retrieval is not recall.</span>
           </span>
-          <span class="entry__meta">15 min<br><span class="fid fid--analogy">analogy</span></span>
+          <span class="entry__meta"><span>15 min</span><span class="depth depth--core"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> core</span><span class="fid fid--analogy">analogy</span></span>
           <span class="entry__arrow mono" aria-hidden="true">→</span>
         </a>
 
-        <a class="entry side-bridge reveal" data-entry data-side="bridge" href="research/reward-prediction-error.html">
+        <a class="entry side-bridge reveal" data-entry data-side="bridge" data-depth="deep" href="research/reward-prediction-error.html">
           <span class="entry__side" aria-hidden="true"></span>
           <span class="entry__body">
-            <span class="entry__eyebrow"><span class="no">04</span> · the bridge · reinforcement learning</span>
+            <span class="entry__eyebrow">the bridge · reinforcement learning</span>
             <span class="entry__claim">Reward prediction error, actor-critic, and the alignment of objectives</span>
             <span class="entry__desc">The temporal-difference correspondence is unusually strong at the algorithmic level and unusually weak at the level of what is being optimized for.</span>
           </span>
-          <span class="entry__meta">17 min<br><span class="fid fid--mechanism">mechanism</span></span>
+          <span class="entry__meta"><span>17 min</span><span class="depth depth--deep"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> deep dive</span><span class="fid fid--mechanism">mechanism</span></span>
           <span class="entry__arrow mono" aria-hidden="true">→</span>
         </a>
 
-        <a class="entry side-comp reveal" data-entry data-side="comp" href="research/framing-anchoring-prompt.html">
+        <a class="entry side-comp reveal" data-entry data-side="comp" data-depth="core" href="research/framing-anchoring-prompt.html">
           <span class="entry__side" aria-hidden="true"></span>
           <span class="entry__body">
-            <span class="entry__eyebrow"><span class="no">05</span> · computational · prompt behavior</span>
+            <span class="entry__eyebrow">computational · prompt behavior</span>
             <span class="entry__claim">Framing, anchoring, and the behavioral economics of the prompt</span>
             <span class="entry__desc">Prompt sensitivity looks like framing and anchoring in human subjects. The surface is striking, the underlying causes almost certainly unrelated.</span>
           </span>
-          <span class="entry__meta">13 min<br><span class="fid fid--metaphor">metaphor</span></span>
+          <span class="entry__meta"><span>13 min</span><span class="depth depth--core"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> core</span><span class="fid fid--metaphor">metaphor</span></span>
           <span class="entry__arrow mono" aria-hidden="true">→</span>
         </a>
 
@@ -161,8 +255,8 @@
         <h2 id="method">how to read these</h2>
         <p>one device, held site-wide</p>
       </div>
-      <div class="hero__grid" style="align-items:start;">
-        <div class="hero__thesis" style="max-width:38ch;">
+      <div class="hero__row" style="align-items:start;">
+        <div class="hero__meta" style="max-width:38ch;">
           <p style="font-size:1.08rem;line-height:1.55;">Every essay carries a <strong>correspondence table</strong>: the neuroscience concept, the machine-learning concept, and a fidelity rating that is one of three words.</p>
           <p style="font-size:1.08rem;line-height:1.55;">And every essay carries a <strong>where the mapping breaks</strong> section. Nothing here claims a correspondence without also stating its limit. If a claim survives that section, it has earned the space.</p>
         </div>
