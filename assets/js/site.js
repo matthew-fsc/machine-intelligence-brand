@@ -27,6 +27,14 @@
       if (pairEl) pairEl.textContent = p.note;
       if (fidEl) { fidEl.textContent = p.fid; fidEl.className = fidClass(p.fid); }
     }
+    var bridge = corr.querySelector(".corr__bridge-path");
+    function redrawBridge() {
+      if (!bridge) return;
+      bridge.style.animation = "none";
+      // force reflow so the draw animation restarts cleanly on each swap
+      void bridge.getBoundingClientRect();
+      bridge.style.animation = "";
+    }
     render(pairs[0]);
     if (!reduce) {
       setInterval(function () {
@@ -34,6 +42,7 @@
         setTimeout(function () {
           i = (i + 1) % pairs.length;
           render(pairs[i]);
+          redrawBridge();
           corr.classList.remove("is-swapping");
         }, 300);
       }, 3600);
