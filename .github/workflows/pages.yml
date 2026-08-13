@@ -1,10 +1,11 @@
 name: Deploy static site to GitHub Pages
 
+# Deploy when the site lands on the default branch, or on demand. Feature
+# branches do not trigger a deploy, so an in-review PR carries no deploy check.
 on:
   push:
     branches:
       - main
-      - claude/brand-learning-research-site-oqx1kt
   workflow_dispatch:
 
 permissions:

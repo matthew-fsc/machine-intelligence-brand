@@ -49,9 +49,17 @@ subpath such as GitHub Pages.
 
 ## Hosting
 
-Deployed to GitHub Pages by `.github/workflows/pages.yml` on push. In the
-repository, set **Settings → Pages → Build and deployment → Source** to
-**GitHub Actions** once; the workflow does the rest.
+Deployed to GitHub Pages by `.github/workflows/pages.yml`, which runs when the
+site lands on `main` (or on manual dispatch). One repository setting is
+required once, by an owner:
+
+1. Go to **Settings → Pages → Build and deployment**.
+2. Set **Source** to **GitHub Actions**.
+
+After that, every push to `main` publishes the site. The workflow also passes
+`enablement: true`, so on repositories where the Actions token is allowed to
+manage Pages, that manual step is not needed. The deploy runs only on `main`,
+so a feature-branch pull request never shows a failing deploy check.
 
 ## Dependencies
 
