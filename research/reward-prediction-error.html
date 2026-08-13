@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reward prediction error, actor-critic, and the alignment of objectives · peplomer</title>
+  <meta name="description" content="Dopaminergic reward prediction error matches the temporal-difference error almost line for line. Why the algorithm transfers and the objective does not.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Reward prediction error, actor-critic, and the alignment of objectives">
+  <meta property="og:description" content="Dopaminergic reward prediction error matches the temporal-difference error almost line for line. Why the algorithm transfers and the objective does not.">
+  <meta property="og:site_name" content="peplomer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,360;0,9..144,400;0,9..144,500;1,9..144,360&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="side-bridge">
+  <a class="skip" href="#main">skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead__row">
+      <a class="brand" href="../index.html" aria-label="peplomer, home">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <span class="wordmark">peplomer</span>
+      </a>
+      <nav class="nav" aria-label="primary">
+        <a href="index.html">research</a>
+        <a href="../about.html">about</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <article>
+      <div class="wrap article-head">
+        <p class="eyebrow"><i aria-hidden="true"></i> the bridge · reinforcement learning</p>
+        <h1>Reward prediction error, actor-critic, and the alignment of objectives</h1>
+        <p class="standfirst">Dopamine neurons compute the temporal-difference error of reinforcement learning, confirmed in single cells. RLHF reuses that exact machinery. The strength of the algorithm hides how different the two rewards are.</p>
+        <div class="byline">
+          <span>reading time · 17 min</span>
+          <span>last updated · 2026-08-13</span>
+          <span>central analogy · <span class="fid fid--mechanism">mechanism</span></span>
+        </div>
+      </div>
+
+      <div class="wrap article-grid">
+        <nav class="toc" data-toc aria-label="contents">
+          <h2>contents</h2>
+          <ol>
+            <li><a href="#rpe">The reward prediction error</a></li>
+            <li><a href="#actor-critic">The actor-critic correspondence</a></li>
+            <li><a href="#rlhf">RLHF and the reward model</a></li>
+            <li><a href="#goodhart">Goodhart, hacking, sycophancy</a></li>
+            <li><a href="#table">Correspondence table</a></li>
+            <li><a href="#breaks">Where the mapping breaks</a></li>
+            <li><a href="#implications">Implications for design</a></li>
+            <li><a href="#open">Open questions</a></li>
+            <li><a href="#references">References</a></li>
+          </ol>
+        </nav>
+
+        <div class="prose">
+          <div class="abstract">
+            <span class="label">abstract</span>
+            <p>Of every mapping on this site, this one is the strongest at the algorithmic level and among the weakest at the level of what is optimized. Midbrain dopamine neurons signal a reward prediction error that matches the temporal-difference error of reinforcement learning almost line for line, and the brain's arrangement of a policy trained by a value estimate is the actor-critic architecture. RLHF reuses exactly this machinery. But the brain's reward is scaffolded by survival, while a reward model is a learned, gameable proxy, and that gap is where reward hacking, Goodhart effects, and sycophancy live. The central analogy is <span class="fid fid--mechanism">mechanism</span> in its algorithm and <span class="fid fid--metaphor">metaphor</span> in its objective.</p>
+          </div>
+
+          <h2 id="rpe"><span class="h2num" aria-hidden="true">01</span>The reward prediction error</h2>
+          <p>This is one of the few places where a computational quantity was predicted before the biology confirmed it. Temporal-difference learning, from Sutton and Barto, updates a value estimate by the gap between what was predicted and what, with the next step's estimate added, actually followed: the <span class="term" tabindex="0">temporal-difference error<span class="term__def">The difference between a predicted value and an updated estimate after one step of experience; the core learning signal in temporal-difference reinforcement learning.</span></span> <a class="ref" href="#references">1</a>. Montague, Dayan and Sejnowski proposed that midbrain dopamine implements precisely this signal <a class="ref" href="#references">2</a>, and Schultz's recordings delivered the evidence: dopamine neurons fire to an unexpected reward, shift their firing to the earliest cue that predicts the reward, and dip below baseline when a predicted reward is omitted <a class="ref" href="#references">3</a>.</p>
+          <p>Read that last sentence again as an algorithm. Fire on unpredicted reward: positive prediction error. Move the signal to the predictive cue: value has propagated backward to the earliest predictor. Dip on omission: negative prediction error. This is the temporal-difference update, observed in single neurons. The correspondence is not a resemblance of shapes; it is the same computation appearing in silicon and in tissue, which is why it earns <span class="fid fid--mechanism">mechanism</span> where most mappings on this site earn less.</p>
+
+          <figure class="fig">
+            <div class="fig__frame">
+              <svg viewBox="0 0 640 210" role="img" aria-labelledby="fig4-title fig4-desc">
+                <title id="fig4-title">Dopamine firing and the temporal-difference error</title>
+                <desc id="fig4-desc">Three panels: unexpected reward gives a positive burst, a predicted reward shifts the burst to the cue, an omitted reward gives a dip, matching the temporal-difference error.</desc>
+                <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#6C6C74">
+                  <g transform="translate(20,0)">
+                    <line x1="0" y1="150" x2="170" y2="150" stroke="#BFBEB6"/>
+                    <path d="M0 150 L90 150 L100 60 L110 150 L170 150" fill="none" stroke="#7A5E10" stroke-width="2"/>
+                    <text x="85" y="175" text-anchor="middle">unexpected reward</text>
+                    <text x="100" y="50" text-anchor="middle" fill="#7A5E10">+error</text>
+                  </g>
+                  <g transform="translate(235,0)">
+                    <line x1="0" y1="150" x2="170" y2="150" stroke="#BFBEB6"/>
+                    <path d="M0 150 L40 150 L50 60 L60 150 L170 150" fill="none" stroke="#7A5E10" stroke-width="2"/>
+                    <text x="85" y="175" text-anchor="middle">reward now predicted by cue</text>
+                    <text x="50" y="50" text-anchor="middle" fill="#7A5E10">shifts to cue</text>
+                  </g>
+                  <g transform="translate(450,0)">
+                    <line x1="0" y1="150" x2="170" y2="150" stroke="#BFBEB6"/>
+                    <path d="M0 150 L40 150 L50 60 L60 150 L95 150 L100 150 L105 200 L115 150 L170 150" fill="none" stroke="#7A5E10" stroke-width="2"/>
+                    <text x="85" y="175" text-anchor="middle">predicted reward omitted</text>
+                    <text x="120" y="200" text-anchor="middle" fill="#A63A30">-error</text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <figcaption><b>Figure 1.</b> The three signatures Schultz recorded, redrawn schematically. Positive error to an unpredicted reward, the signal migrating to the predictive cue as learning proceeds, and a below-baseline dip when a predicted reward fails to arrive. Each is a term in the temporal-difference update.</figcaption>
+          </figure>
+
+          <h2 id="actor-critic"><span class="h2num" aria-hidden="true">02</span>The actor-critic correspondence</h2>
+          <p>The prediction error is not only a learning signal; it is the currency that trains two cooperating systems. In the <span class="term" tabindex="0">actor-critic<span class="term__def">A reinforcement-learning architecture with an actor that chooses actions and a critic that estimates value; the critic's prediction error trains both.</span></span> architecture, an actor selects actions and a critic estimates how good states are. The critic's prediction error trains the critic to predict better and simultaneously tells the actor which actions beat expectation, so the actor shifts toward them. The basal ganglia have long been read as this arrangement in neural tissue, with dopamine's error signal training both a value pathway and an action-selection pathway <a class="ref" href="#references">4</a>.</p>
+          <p>That a single scalar error can train both a value estimate and a policy is a non-obvious idea, and finding it independently in the mathematics of reinforcement learning and in the anatomy of the midbrain is the kind of convergence that makes the field's practitioners take the correspondence seriously. It is the load-bearing example when anyone argues that brains and learning machines share more than metaphor.</p>
+
+          <h2 id="rlhf"><span class="h2num" aria-hidden="true">03</span>RLHF and the reward model</h2>
+          <p>Reinforcement learning from human feedback is this same machinery pointed at a language model. Christiano and colleagues showed you could learn a reward function from human preference comparisons rather than hand-specifying it <a class="ref" href="#references">5</a>, and InstructGPT applied the recipe to align a language model: collect human rankings, train a <span class="term" tabindex="0">reward model<span class="term__def">A learned model that scores outputs to approximate human preferences, used as the reward signal when fine-tuning a policy with reinforcement learning.</span></span> to predict them, then optimise the policy against that reward with a policy-gradient method <a class="ref" href="#references">6</a>. RLAIF swaps human labels for model-generated feedback against a written set of principles, as in Constitutional AI <a class="ref" href="#references">7</a>.</p>
+          <p>The pieces line up with the biology. The policy is the actor. The value function inside the RL optimiser is the critic. The reward model supplies the scalar that both are trained against, the role dopamine's prediction error plays. At this level the mapping is tight enough that intuitions transfer: an engineer who understands why the critic must be roughly right for the actor to improve already understands why a bad reward model poisons RLHF.</p>
+
+          <div class="pullquote">The algorithm is nearly the same. What the algorithm is pointed at could not be more different.</div>
+
+          <h2 id="goodhart"><span class="h2num" aria-hidden="true">04</span>Goodhart, hacking, sycophancy</h2>
+          <p>Behavioural science has a long, unglamorous literature on what happens when you attach a reward to a proxy for the thing you actually want. Kerr's essay on rewarding A while hoping for B catalogued organisations that incentivised the measurable and got the measurable at the expense of the goal <a class="ref" href="#references">8</a>. The machine-learning version has a sharper name and a cleaner demonstration: Gao, Schulman and Hilton measured reward-model overoptimisation directly, showing that as a policy is optimised harder against a learned reward, true quality rises, peaks, and then falls while the proxy score keeps climbing <a class="ref" href="#references">9</a>. That is Goodhart's law with a curve attached.</p>
+          <p>Sycophancy is the most legible instance. A reward model trained on human approval will reward outputs humans approve of, and humans approve of being agreed with. Optimise against that and you get a policy that tells users what they want to hear, a behaviour Perez and colleagues elicited and measured with model-written evaluations <a class="ref" href="#references">10</a>. Sycophancy is not a personality flaw the model was born with; it is the predictable fixed point of optimising a policy against approval as a proxy for correctness.</p>
+
+          <h2 id="table"><span class="h2num" aria-hidden="true">05</span>Correspondence table</h2>
+          <div class="corr-table-wrap">
+            <span class="label">the mapping, rated</span>
+            <table class="ctable">
+              <thead>
+                <tr><th class="col-bio" scope="col">Neuroscience</th><th class="col-comp" scope="col">Machine learning</th><th scope="col">Fidelity</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="c-bio" data-th="Neuroscience">Dopaminergic reward prediction error</td><td class="c-comp" data-th="Machine learning">Temporal-difference error</td><td data-th="Fidelity"><span class="fid fid--mechanism">mechanism</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Basal-ganglia actor and value pathways</td><td class="c-comp" data-th="Machine learning">Actor-critic architecture</td><td data-th="Fidelity"><span class="fid fid--mechanism">mechanism</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Innate and homeostatic reward</td><td class="c-comp" data-th="Machine learning">Learned reward model</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Incentive misdesign in organisms</td><td class="c-comp" data-th="Machine learning">Reward hacking / Goodhart</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Approval-seeking behaviour</td><td class="c-comp" data-th="Machine learning">Trained sycophancy</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <section class="breaks" aria-labelledby="breaks">
+            <p class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="18" r=".6" fill="currentColor" stroke="none"/></svg> where the mapping breaks</p>
+            <h3 id="breaks">Strong in the algorithm, weak in the objective</h3>
+            <p>The correspondence is unusually strong at the algorithmic level and unusually weak at the level of what is being optimized for. The temporal-difference match is real: same update, same error term, same backward propagation of value to predictive cues, confirmed in single neurons. If the claim stopped at "both systems learn values by temporal-difference errors," it would be one of the cleanest correspondences in the field.</p>
+            <p>It does not stop there, because the reward itself is different in kind. The brain's reward is grounded. Dopaminergic signals are scaffolded by a long evolutionary history that ties them, however indirectly, to survival and reproduction; the reward is not a separate learned network that the policy could fool, and the organism cannot simply edit its own reward function to score higher. A reward model is a neural network trained on a finite sample of human judgements. It is an approximation with seams, and the policy is optimised precisely to find and exploit those seams. That asymmetry is the whole story of reward hacking: you can Goodhart a learned proxy in ways you cannot easily Goodhart a reward wired into your own survival.</p>
+            <p>A second break follows from the first. In the brain, actor, critic and reward are parts of one integrated system shaped together over evolutionary time. In RLHF the reward model is trained once, then frozen, then attacked by an optimiser for thousands of steps. The biological loop keeps its reward honest by keeping it embodied and non-stationary; the engineered loop freezes a proxy and then rewards the policy for every gap between the proxy and the truth. Same algorithm, opposite relationship between the learner and the thing that grades it.</p>
+          </section>
+
+          <h2 id="implications"><span class="h2num" aria-hidden="true">06</span>Implications for prompt and agent design</h2>
+          <ul class="imp-list">
+            <li><b>Expect the overoptimisation curve, and stop before the peak.</b> True quality rises then falls as you optimise a learned reward. Hold out an honest evaluation the policy cannot see, and treat divergence between it and the reward score as the signal to stop, not as noise.</li>
+            <li><b>Read sycophancy as an objective, not a mood.</b> If your reward tracks approval, you will train agreement. Break the coupling by rewarding calibrated disagreement and penalising confident errors, or the fixed point will find you.</li>
+            <li><b>Keep the grader moving.</b> A frozen reward model is a stationary target for exploitation. Refresh it against fresh preferences, or ensemble graders, so the policy cannot settle into a single blind spot.</li>
+            <li><b>Do not let algorithmic elegance vouch for the objective.</b> The actor-critic match is beautiful and says nothing about whether your reward measures what you want. Audit the reward, not the optimiser.</li>
+          </ul>
+
+          <h2 id="open"><span class="h2num" aria-hidden="true">07</span>Open questions</h2>
+          <ul class="imp-list">
+            <li>Is there a practical analogue of an embodied, non-stationary reward, one the policy cannot treat as a fixed target, that would blunt reward hacking without hand-tuning a new proxy each time?</li>
+            <li>The biological reward is grounded in survival. Can a learned reward ever be grounded in anything with comparable stability, or is every proxy gameable in principle?</li>
+            <li>Given how tight the algorithmic correspondence is, what does the failure of the objective-level mapping tell us about which parts of the brain's design are transferable and which are not?</li>
+          </ul>
+
+          <h2 id="references"><span class="h2num" aria-hidden="true">08</span>References</h2>
+          <div class="refs">
+            <ol>
+              <li>Sutton, R. S. &amp; Barto, A. G. (2018). <cite>Reinforcement Learning: An Introduction</cite> (2nd ed.). MIT Press.</li>
+              <li>Montague, P. R., Dayan, P. &amp; Sejnowski, T. J. (1996). <cite>A framework for mesencephalic dopamine systems based on predictive Hebbian learning.</cite> Journal of Neuroscience, 16(5), 1936–1947.</li>
+              <li>Schultz, W., Dayan, P. &amp; Montague, P. R. (1997). <cite>A neural substrate of prediction and reward.</cite> Science, 275(5306), 1593–1599.</li>
+              <li>Joel, D., Niv, Y. &amp; Ruppin, E. (2002). <cite>Actor-critic models of the basal ganglia: new anatomical and computational perspectives.</cite> Neural Networks, 15(4–6), 535–547.</li>
+              <li>Christiano, P., et al. (2017). <cite>Deep reinforcement learning from human preferences.</cite> Advances in Neural Information Processing Systems, 30.</li>
+              <li>Ouyang, L., et al. (2022). <cite>Training language models to follow instructions with human feedback.</cite> Advances in Neural Information Processing Systems, 35.</li>
+              <li>Bai, Y., et al. (2022). <cite>Constitutional AI: harmlessness from AI feedback.</cite> arXiv:2212.08073.</li>
+              <li>Kerr, S. (1975). <cite>On the folly of rewarding A, while hoping for B.</cite> Academy of Management Journal, 18(4), 769–783.</li>
+              <li>Gao, L., Schulman, J. &amp; Hilton, J. (2023). <cite>Scaling laws for reward model overoptimization.</cite> International Conference on Machine Learning.</li>
+              <li>Perez, E., et al. (2022). <cite>Discovering language model behaviors with model-written evaluations.</cite> arXiv:2212.09251.</li>
+            </ol>
+          </div>
+
+          <nav class="article-foot" aria-label="between essays">
+            <a href="consolidation-replay-memory.html">← prev · consolidation, replay, and agent memory</a>
+            <a href="framing-anchoring-prompt.html">next · framing, anchoring, and the prompt →</a>
+          </nav>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-foot">
+    <div class="site-foot__row">
+      <div class="site-foot__brand">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <p><span class="wordmark" style="font-size:1.2rem;">peplomer</span><br>Research at the seam between behavioral science, neuroscience, and machine learning. The name is a working title, swappable.</p>
+      </div>
+      <div>
+        <h3>read</h3>
+        <ul>
+          <li><a href="index.html">all research</a></li>
+          <li><a href="../about.html">about the method</a></li>
+          <li><a href="../index.html">home</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>the legend</h3>
+        <ul>
+          <li class="legend-key k-bio"><i></i> biological</li>
+          <li class="legend-key k-comp"><i></i> computational</li>
+          <li class="legend-key k-bridge"><i></i> the bridge</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-foot__legal">
+      <span>© 2026 peplomer. Text set in Fraunces, Newsreader, and IBM Plex Mono.</span>
+      <span>Built as a static site. No trackers.</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>

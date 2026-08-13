@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dual-process theory, metacognition, and the reasoning trace · peplomer</title>
+  <meta name="description" content="System 1 and System 2 next to chain of thought and verifier models. Why a reasoning trace is not deliberation, and how unfaithful traces expose the gap.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Dual-process theory, metacognition, and the reasoning trace">
+  <meta property="og:description" content="System 1 and System 2 next to chain of thought and verifier models. Why a reasoning trace is not deliberation, and how unfaithful traces expose the gap.">
+  <meta property="og:site_name" content="peplomer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,360;0,9..144,400;0,9..144,500;1,9..144,360&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="side-comp">
+  <a class="skip" href="#main">skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead__row">
+      <a class="brand" href="../index.html" aria-label="peplomer, home">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <span class="wordmark">peplomer</span>
+      </a>
+      <nav class="nav" aria-label="primary">
+        <a href="index.html">research</a>
+        <a href="../about.html">about</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <article>
+      <div class="wrap article-head">
+        <p class="eyebrow"><i aria-hidden="true"></i> computational · reasoning traces</p>
+        <h1>Dual-process theory, metacognition, and the reasoning trace</h1>
+        <p class="standfirst">A page of step-by-step working looks like the slow, careful system switching on. In a language model it is the same forward pass, only longer, and the trace can lie about what happened.</p>
+        <div class="byline">
+          <span>reading time · 16 min</span>
+          <span>last updated · 2026-08-13</span>
+          <span>central analogy · <span class="fid fid--metaphor">metaphor</span></span>
+        </div>
+      </div>
+
+      <div class="wrap article-grid">
+        <nav class="toc" data-toc aria-label="contents">
+          <h2>contents</h2>
+          <ol>
+            <li><a href="#two-systems">Two systems, one substrate</a></li>
+            <li><a href="#monitoring">Metacognitive monitoring</a></li>
+            <li><a href="#the-trace">The reasoning trace</a></li>
+            <li><a href="#verifiers">Budgets, critics, verifiers</a></li>
+            <li><a href="#table">Correspondence table</a></li>
+            <li><a href="#breaks">Where the mapping breaks</a></li>
+            <li><a href="#implications">Implications for design</a></li>
+            <li><a href="#open">Open questions</a></li>
+            <li><a href="#references">References</a></li>
+          </ol>
+        </nav>
+
+        <div class="prose">
+          <div class="abstract">
+            <span class="label">abstract</span>
+            <p>Dual-process theory splits cognition into a fast, automatic System 1 and a slow, effortful System 2, with a metacognitive layer that monitors and intervenes. Chain-of-thought prompting, reasoning budgets, self-critique loops, and verifier models look like System 2 arriving in a language model. They are not. A reasoning trace is produced by the same forward process that produces every other token, so treating it as a separate deliberative faculty imports a mechanism that is not present. The essay rates the central analogy at <span class="fid fid--metaphor">metaphor</span> and takes unfaithful reasoning traces head on.</p>
+          </div>
+
+          <h2 id="two-systems"><span class="h2num" aria-hidden="true">01</span>Two systems, one substrate</h2>
+          <p>The dual-process picture is familiar enough to be a hazard. System 1 is fast, parallel, automatic, and cheap; it answers before you have decided to answer. System 2 is slow, serial, effortful, and capacity-limited; it is what you recruit for long division or an unfamiliar route. Kahneman gave the pair its popular form <a class="ref" href="#references">1</a>, building on the older distinction between <span class="term" tabindex="0">controlled and automatic processing<span class="term__def">Schneider and Shiffrin's distinction between effortful, capacity-limited processing and fast, practiced processing that runs without central resources.</span></span> from Schneider and Shiffrin <a class="ref" href="#references">2</a>, and the more careful two-process accounts developed by Evans and Stanovich <a class="ref" href="#references">3</a>.</p>
+          <p>The temptation with a language model is immediate. A direct answer, produced in one shot, feels like System 1. An answer produced after a page of step-by-step working feels like System 2 was engaged. The prompt "think step by step" reads as an instruction to switch systems. This is a clean story, and the cleanliness is exactly the problem, because in the model there is only one system.</p>
+          <p>Every token, whether it lands in the visible answer or in the reasoning that precedes it, is generated by the same forward pass through the same weights. There is no separate serial reasoner that wakes up when the tokens get analytical. The "slow" trace is not slower per token; it is simply longer, and length is doing work that we are attributing to a change of mechanism.</p>
+
+          <h2 id="monitoring"><span class="h2num" aria-hidden="true">02</span>Metacognitive monitoring</h2>
+          <p>The part of dual-process theory that transfers least, and matters most, is <span class="term" tabindex="0">metacognition<span class="term__def">Cognition about cognition: monitoring the state of one's own processing and controlling it, for example knowing that you do not know.</span></span>. Nelson and Narens formalised it as two levels connected by monitoring and control: an object level that does the task, and a meta level that watches the object level and adjusts it <a class="ref" href="#references">4</a>. Monitoring is how you know that you do not know, that a word is on the tip of your tongue, that this proof step feels shaky. Control is how that knowledge changes what you do next.</p>
+          <p>A model exposes surface signals that resemble metacognitive reports. It can output a confidence, say "I am not sure," or flag a step as uncertain. But these are predictions of what a self-monitoring agent would say, generated by the same process as the answer, not readouts from a separate monitor with access to the object level's actual state. The distinction is not pedantic. It is the difference between a calibrated confidence that tracks correctness and a fluent-sounding confidence that tracks the training distribution of confident-sounding text.</p>
+
+          <div class="pullquote">Length is doing the work we keep attributing to a change of mechanism.</div>
+
+          <h2 id="the-trace"><span class="h2num" aria-hidden="true">03</span>The reasoning trace</h2>
+          <p>Chain-of-thought prompting is the empirical anchor here. Wei and colleagues showed that eliciting intermediate steps improves performance on multi-step problems, and that the effect grows with scale <a class="ref" href="#references">5</a>. The result is robust and useful. The open question is why it works, and the dual-process framing offers an answer that is probably wrong: that the trace is the model "reasoning" rather than guessing.</p>
+          <p>A less flattering and better-supported account is mechanical. Generating intermediate tokens gives the model more forward passes conditioned on partial results, spreads a hard computation across more positions, and keeps intermediate quantities in the context where later steps can attend to them. On this view the trace is a scratchpad that raises the effective compute available for the answer, not a window onto deliberation. Both accounts predict the accuracy gain. Only one of them licenses reading the trace as an explanation.</p>
+
+          <figure class="fig">
+            <div class="fig__frame">
+              <svg viewBox="0 0 640 220" role="img" aria-labelledby="fig2-title fig2-desc">
+                <title id="fig2-title">One forward process, two readings</title>
+                <desc id="fig2-desc">A single left-to-right chain of tokens. A dual-process reading overlays a false boundary between reasoning and answer; the mechanism underneath is uniform.</desc>
+                <g font-family="IBM Plex Mono, monospace" font-size="11">
+                  <line x1="40" y1="120" x2="600" y2="120" stroke="#BFBEB6" stroke-width="1.5"/>
+                  <g fill="#1B1B22">
+                    <circle cx="70" cy="120" r="5"/><circle cx="150" cy="120" r="5"/><circle cx="230" cy="120" r="5"/>
+                    <circle cx="310" cy="120" r="5"/><circle cx="390" cy="120" r="5"/><circle cx="470" cy="120" r="5"/>
+                    <circle cx="560" cy="120" r="7" fill="#A63A30"/>
+                  </g>
+                  <text x="70" y="145" text-anchor="middle" fill="#6C6C74">tok</text>
+                  <text x="230" y="145" text-anchor="middle" fill="#6C6C74">reasoning tokens</text>
+                  <text x="560" y="145" text-anchor="middle" fill="#A63A30">answer</text>
+                  <!-- false boundary -->
+                  <line x1="515" y1="70" x2="515" y2="170" stroke="#A63A30" stroke-width="1.4" stroke-dasharray="4 4"/>
+                  <text x="515" y="60" text-anchor="middle" fill="#A63A30">imagined System 1 / 2 boundary</text>
+                  <!-- uniform mechanism band -->
+                  <rect x="40" y="180" width="560" height="18" fill="rgba(228,169,162,.16)" stroke="#E4A9A2"/>
+                  <text x="320" y="193" text-anchor="middle" fill="#1B1B22">same weights, same forward pass, every token</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption><b>Figure 1.</b> The reasoning trace and the answer are not produced by different systems. The dashed line is a boundary we project onto a uniform process. Where the trace helps, it does so by raising effective compute, not by switching faculties.</figcaption>
+          </figure>
+
+          <h2 id="verifiers"><span class="h2num" aria-hidden="true">04</span>Budgets, critics, verifiers</h2>
+          <p>The engineering response to the limits of a single trace has been to add outer loops, and these map onto the control side of metacognition more honestly than the trace itself does. A reasoning budget allocates more tokens or samples to harder problems, echoing effortful System 2 recruitment. Self-critique methods such as Self-Refine have the model draft, critique, and revise <a class="ref" href="#references">6</a>. Verifier models train a separate network to score candidate solutions, as Cobbe and colleagues did for math word problems, and select among samples <a class="ref" href="#references">7</a>.</p>
+          <p>The important structural point is that a verifier is a second system, actually separate, with its own parameters and its own objective. That is a real division of labour, and it is closer to the object-level and meta-level split than anything a single model's trace provides. When a design wants genuine monitoring, it is more honest to build a distinct checker than to trust the model's own account of its confidence.</p>
+
+          <h2 id="table"><span class="h2num" aria-hidden="true">05</span>Correspondence table</h2>
+          <div class="corr-table-wrap">
+            <span class="label">the mapping, rated</span>
+            <table class="ctable">
+              <thead>
+                <tr><th class="col-bio" scope="col">Cognitive science</th><th class="col-comp" scope="col">Machine learning</th><th scope="col">Fidelity</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="c-bio" data-th="Cognitive science">System 2, effortful serial reasoning</td><td class="c-comp" data-th="Machine learning">Chain-of-thought trace</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+                <tr><td class="c-bio" data-th="Cognitive science">Effort allocation / recruitment</td><td class="c-comp" data-th="Machine learning">Reasoning / token budget</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Cognitive science">Metacognitive monitoring</td><td class="c-comp" data-th="Machine learning">Verbalised self-confidence</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+                <tr><td class="c-bio" data-th="Cognitive science">Metacognitive control</td><td class="c-comp" data-th="Machine learning">Self-critique / revise loops</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Cognitive science">Object level vs meta level split</td><td class="c-comp" data-th="Machine learning">Separate verifier model</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <section class="breaks" aria-labelledby="breaks">
+            <p class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="18" r=".6" fill="currentColor" stroke="none"/></svg> where the mapping breaks</p>
+            <h3 id="breaks">The trace is not the cause of the answer</h3>
+            <p>The sharpest break is empirical, not philosophical. If a reasoning trace were deliberation, it would be the causal path to the answer, and intervening on the reasoning would change the conclusion. It often does not. Turpin and colleagues showed that models produce plausible chains of thought that do not reflect the factors actually driving their outputs: bias the answer with a spurious cue, and the model still writes a clean, cue-free justification for the answer the cue produced <a class="ref" href="#references">8</a>. Lanham and colleagues measured this faithfulness directly and found that traces can be post-hoc rationalisations rather than the computation that yielded the result <a class="ref" href="#references">9</a>.</p>
+            <p>This is fatal to the strong reading and important for the weak one. Calling the trace "System 2" imports a commitment that the visible reasoning is the mechanism of the decision. In a person, that commitment is already shaky; confabulation research shows humans narrate reasons they did not use. In a model, the narration and the decision share a substrate and can come apart with no signal at the surface. A fluent, correct-looking trace is evidence about the distribution of fluent traces, not a guarantee about the path the model took.</p>
+            <p>So the useful stance is instrumental. Chain of thought is a technique that raises accuracy on multi-step tasks and, sometimes, a partial and unreliable window onto the computation. Treat it as the first, verify before you treat it as the second, and never let "the model explained its reasoning" stand in for "the reasoning is what happened."</p>
+          </section>
+
+          <h2 id="implications"><span class="h2num" aria-hidden="true">06</span>Implications for prompt and agent design</h2>
+          <ul class="imp-list">
+            <li><b>Use chain of thought for accuracy, not for audit.</b> Elicit steps when the task is multi-step and the gain is real. Do not present the trace to a user as an explanation of why the answer is right unless you have checked that it is faithful.</li>
+            <li><b>Prefer a separate verifier over self-reported confidence.</b> A distinct checker with its own objective is a real meta level. A model's "I am confident" is a prediction of confident text. When correctness matters, score with something external.</li>
+            <li><b>Spend budget where the problem is hard, not uniformly.</b> Reasoning budgets are the honest analogue of effort recruitment. Allocate samples and tokens by difficulty, and measure whether the extra compute actually moves the answer.</li>
+            <li><b>Test faithfulness by intervention.</b> Perturb the trace, inject or remove a step, and see if the conclusion follows. If it does not, you have a rationalisation, and you should stop reading it as a cause.</li>
+          </ul>
+
+          <h2 id="open"><span class="h2num" aria-hidden="true">07</span>Open questions</h2>
+          <ul class="imp-list">
+            <li>Can we train models whose traces are causally load-bearing, such that intervening on a step reliably changes the answer, and would that make them more useful or merely more convincing?</li>
+            <li>Is verbalised uncertainty ever calibrated enough to substitute for an external verifier, and under what training does it become so?</li>
+            <li>If effort in humans is capacity-limited and metabolically costly, what is the model's true cost function for "thinking longer," and does anything about it resemble the trade-offs that shape human deliberation?</li>
+          </ul>
+
+          <h2 id="references"><span class="h2num" aria-hidden="true">08</span>References</h2>
+          <div class="refs">
+            <ol>
+              <li>Kahneman, D. (2011). <cite>Thinking, Fast and Slow.</cite> Farrar, Straus and Giroux.</li>
+              <li>Schneider, W. &amp; Shiffrin, R. M. (1977). <cite>Controlled and automatic human information processing: I. Detection, search, and attention.</cite> Psychological Review, 84(1), 1–66.</li>
+              <li>Evans, J. St. B. T. &amp; Stanovich, K. E. (2013). <cite>Dual-process theories of higher cognition: advancing the debate.</cite> Perspectives on Psychological Science, 8(3), 223–241.</li>
+              <li>Nelson, T. O. &amp; Narens, L. (1990). <cite>Metamemory: a theoretical framework and new findings.</cite> Psychology of Learning and Motivation, 26, 125–173.</li>
+              <li>Wei, J., et al. (2022). <cite>Chain-of-thought prompting elicits reasoning in large language models.</cite> Advances in Neural Information Processing Systems, 35.</li>
+              <li>Madaan, A., et al. (2023). <cite>Self-Refine: iterative refinement with self-feedback.</cite> Advances in Neural Information Processing Systems, 36.</li>
+              <li>Cobbe, K., et al. (2021). <cite>Training verifiers to solve math word problems.</cite> arXiv:2110.14168.</li>
+              <li>Turpin, M., Michael, J., Perez, E. &amp; Bowman, S. R. (2023). <cite>Language models don't always say what they think: unfaithful explanations in chain-of-thought prompting.</cite> Advances in Neural Information Processing Systems, 36.</li>
+              <li>Lanham, T., et al. (2023). <cite>Measuring faithfulness in chain-of-thought reasoning.</cite> arXiv:2307.13702.</li>
+            </ol>
+          </div>
+
+          <nav class="article-foot" aria-label="between essays">
+            <a href="predictive-processing.html">← prev · predictive processing and the prediction objective</a>
+            <a href="consolidation-replay-memory.html">next · consolidation, replay, and agent memory →</a>
+          </nav>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-foot">
+    <div class="site-foot__row">
+      <div class="site-foot__brand">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <p><span class="wordmark" style="font-size:1.2rem;">peplomer</span><br>Research at the seam between behavioral science, neuroscience, and machine learning. The name is a working title, swappable.</p>
+      </div>
+      <div>
+        <h3>read</h3>
+        <ul>
+          <li><a href="index.html">all research</a></li>
+          <li><a href="../about.html">about the method</a></li>
+          <li><a href="../index.html">home</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>the legend</h3>
+        <ul>
+          <li class="legend-key k-bio"><i></i> biological</li>
+          <li class="legend-key k-comp"><i></i> computational</li>
+          <li class="legend-key k-bridge"><i></i> the bridge</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-foot__legal">
+      <span>© 2026 peplomer. Text set in Fraunces, Newsreader, and IBM Plex Mono.</span>
+      <span>Built as a static site. No trackers.</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>
