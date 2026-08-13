@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Framing, anchoring, and the behavioral economics of the prompt · peplomer</title>
+  <meta name="description" content="Framing, anchoring, and order effects in humans next to prompt sensitivity, position bias, and few-shot ordering. Striking surface, unrelated causes, and why that is useful.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Framing, anchoring, and the behavioral economics of the prompt">
+  <meta property="og:description" content="Framing, anchoring, and order effects in humans next to prompt sensitivity, position bias, and few-shot ordering. Striking surface, unrelated causes, and why that is useful.">
+  <meta property="og:site_name" content="peplomer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,360;0,9..144,400;0,9..144,500;1,9..144,360&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="side-comp">
+  <a class="skip" href="#main">skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead__row">
+      <a class="brand" href="../index.html" aria-label="peplomer, home">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <span class="wordmark">peplomer</span>
+      </a>
+      <nav class="nav" aria-label="primary">
+        <a href="index.html">research</a>
+        <a href="../about.html">about</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <article>
+      <div class="wrap article-head">
+        <p class="eyebrow"><i aria-hidden="true"></i> computational · prompt behavior</p>
+        <h1>Framing, anchoring, and the behavioral economics of the prompt</h1>
+        <p class="standfirst">Prompt sensitivity looks like framing, position bias looks like the serial-position curve, and leading eval prompts look like demand characteristics. The resemblance is real and the mechanisms are not shared.</p>
+        <div class="byline">
+          <span>reading time · 13 min</span>
+          <span>last updated · 2026-08-13</span>
+          <span>central analogy · <span class="fid fid--metaphor">metaphor</span></span>
+        </div>
+      </div>
+
+      <div class="wrap article-grid">
+        <nav class="toc" data-toc aria-label="contents">
+          <h2>contents</h2>
+          <ol>
+            <li><a href="#effects">The human effects</a></li>
+            <li><a href="#prompt">The prompt versions</a></li>
+            <li><a href="#position">Position and order</a></li>
+            <li><a href="#demand">Demand characteristics in evals</a></li>
+            <li><a href="#table">Correspondence table</a></li>
+            <li><a href="#breaks">Where the mapping breaks</a></li>
+            <li><a href="#implications">Implications for design</a></li>
+            <li><a href="#open">Open questions</a></li>
+            <li><a href="#references">References</a></li>
+          </ol>
+        </nav>
+
+        <div class="prose">
+          <div class="abstract">
+            <span class="label">abstract</span>
+            <p>Human judgement bends to how a question is framed, to an irrelevant anchor, to what came just before, and to what the subject thinks the experimenter wants. Language-model outputs bend to prompt phrasing, to a fact's position in a long context, to the order of few-shot examples, and to leading questions in evaluations. The surface similarity is striking. The underlying causes are almost certainly unrelated, which is exactly why the analogy is productive for generating hypotheses and dangerous for explaining results. The central analogy is <span class="fid fid--metaphor">metaphor</span>, and that rating is the point.</p>
+          </div>
+
+          <h2 id="effects"><span class="h2num" aria-hidden="true">01</span>The human effects</h2>
+          <p>Behavioural economics is, in large part, a catalogue of the ways context moves a judgement that logically should not move. <span class="term" tabindex="0">Anchoring<span class="term__def">The tendency for an initial number, even an irrelevant one, to pull subsequent numerical estimates toward it.</span></span>: Tversky and Kahneman spun a wheel of fortune, and subjects' estimates of an unrelated quantity were pulled toward whatever number the wheel had landed on <a class="ref" href="#references">1</a>. <span class="term" tabindex="0">Framing<span class="term__def">The finding that logically equivalent descriptions of the same choice, such as survival versus mortality rates, produce systematically different preferences.</span></span>: the same policy described in terms of lives saved versus lives lost flips the majority preference, though the outcomes are identical <a class="ref" href="#references">2</a>. Priming: exposure to one stimulus changes the response to a later one, as when reading a word speeds recognition of a related word <a class="ref" href="#references">3</a>. Order and recency effects shuffle judgements by sequence alone.</p>
+          <p>These are robust, replicated, and, for the most part, mechanistically mysterious in their own right. They are usually explained by appeal to heuristics, limited attention, and the architecture of human memory, but the explanations are themselves debated. What matters here is that the effects are real and that they share a form: a variable that a rational agent should ignore reliably shifts the response.</p>
+
+          <h2 id="prompt"><span class="h2num" aria-hidden="true">02</span>The prompt versions</h2>
+          <p>Every one of those effects has a machine-shaped twin. Prompt sensitivity is the headline: trivial changes in wording, formatting, or separators move a model's output, sometimes by margins large enough to swamp the difference between models. Sclar and colleagues quantified how much accuracy swings under formatting choices that should be semantically inert, spacing, casing, delimiter style, and found the spread alarming <a class="ref" href="#references">4</a>. That is framing, transposed: logically equivalent presentations, different answers.</p>
+          <p>The anchoring twin is just as easy to elicit. Put a number in the prompt, ask for an unrelated estimate, and the output leans toward the number. Ask a leading question and the model tends to confirm its presupposition. To a behavioural scientist these look like old friends, and that recognition is genuinely useful: the human literature is a ready-made list of manipulations to try, a source of hypotheses about where a model will prove brittle. The catalogue transfers even if the mechanism does not.</p>
+
+          <div class="pullquote">The human catalogue transfers as a list of things to try, not as an explanation of why they work.</div>
+
+          <h2 id="position"><span class="h2num" aria-hidden="true">03</span>Position and order</h2>
+          <p>Two effects are precise enough to measure cleanly and worth separating from the rest. <span class="term" tabindex="0">Position bias<span class="term__def">The tendency of a model to use information differently depending on where it sits in the context, often neglecting the middle of a long input.</span></span> in long contexts: Liu and colleagues showed that models use information best when it appears at the beginning or end of the context and worst when it is buried in the middle, the now-familiar lost-in-the-middle curve <a class="ref" href="#references">5</a>. That looks like primacy and recency, the serial-position curve from human memory, and the resemblance is close enough to be eerie.</p>
+          <p>Few-shot ordering is the other. The sequence in which examples are presented changes a model's predictions, sometimes dramatically, and Lu and colleagues showed that a good ordering and a bad ordering of the same examples can span most of the achievable accuracy range <a class="ref" href="#references">6</a>. Zhao and colleagues traced part of this to a measurable bias toward certain answers that can be estimated and subtracted, calibrating the model before use <a class="ref" href="#references">7</a>. The human twin is the order effect; the difference is that the model's version can be characterised numerically and partly corrected, which the human version resists.</p>
+
+          <figure class="fig">
+            <div class="fig__frame">
+              <svg viewBox="0 0 640 210" role="img" aria-labelledby="fig5-title fig5-desc">
+                <title id="fig5-title">Serial position and lost in the middle</title>
+                <desc id="fig5-desc">Two overlaid U-shaped curves: human recall by serial position, and model accuracy by position of a relevant fact in a long context. Both are high at the ends and low in the middle.</desc>
+                <g font-family="IBM Plex Mono, monospace" font-size="11">
+                  <line x1="60" y1="170" x2="600" y2="170" stroke="#BFBEB6"/>
+                  <line x1="60" y1="30" x2="60" y2="170" stroke="#BFBEB6"/>
+                  <text x="330" y="196" text-anchor="middle" fill="#6C6C74">position in sequence · early → late</text>
+                  <path d="M70 55 C 180 165, 480 165, 590 55" fill="none" stroke="#35597F" stroke-width="2"/>
+                  <path d="M70 70 C 190 150, 470 150, 590 70" fill="none" stroke="#A63A30" stroke-width="2" stroke-dasharray="5 4"/>
+                  <circle cx="120" cy="46" r="4" fill="#35597F"/><text x="130" y="44" fill="#35597F">human recall</text>
+                  <circle cx="120" cy="66" r="4" fill="#A63A30"/><text x="130" y="64" fill="#A63A30">model accuracy</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption><b>Figure 1.</b> Two curves with the same U shape and different causes. Human serial-position recall and model accuracy by a fact's position in a long context both fall in the middle. Shared shape is not shared mechanism, and reading one as evidence about the other is the mistake this essay is about.</figcaption>
+          </figure>
+
+          <h2 id="demand"><span class="h2num" aria-hidden="true">04</span>Demand characteristics in evals</h2>
+          <p>There is one more human effect that maps too well onto how we test models. <span class="term" tabindex="0">Demand characteristics<span class="term__def">Cues in an experiment that convey what response is expected, leading subjects to supply it regardless of their true state.</span></span> are the cues in an experiment that tell a subject what the experimenter wants, so the subject obliges, and Orne showed how thoroughly they can contaminate a result <a class="ref" href="#references">8</a>. An evaluation prompt that signals the desired answer, through phrasing, through the framing of the options, through what a helpful assistant is supposed to say, invites exactly this. A model trained to be agreeable is unusually susceptible to the machine version of demand characteristics, and it is a live confound in any eval whose prompt leaks its own expectations.</p>
+
+          <h2 id="table"><span class="h2num" aria-hidden="true">05</span>Correspondence table</h2>
+          <div class="corr-table-wrap">
+            <span class="label">the mapping, rated</span>
+            <table class="ctable">
+              <thead>
+                <tr><th class="col-bio" scope="col">Behavioral science</th><th class="col-comp" scope="col">Machine learning</th><th scope="col">Fidelity</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="c-bio" data-th="Behavioral science">Framing effects</td><td class="c-comp" data-th="Machine learning">Prompt / formatting sensitivity</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+                <tr><td class="c-bio" data-th="Behavioral science">Anchoring</td><td class="c-comp" data-th="Machine learning">Numeric priming in prompts</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+                <tr><td class="c-bio" data-th="Behavioral science">Serial-position (primacy / recency)</td><td class="c-comp" data-th="Machine learning">Lost-in-the-middle position bias</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Behavioral science">Order effects</td><td class="c-comp" data-th="Machine learning">Few-shot example ordering</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Behavioral science">Demand characteristics</td><td class="c-comp" data-th="Machine learning">Leading eval prompts</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <section class="breaks" aria-labelledby="breaks">
+            <p class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="18" r=".6" fill="currentColor" stroke="none"/></svg> where the mapping breaks</p>
+            <h3 id="breaks">Same surface, unrelated causes</h3>
+            <p>The surface similarity is striking, and the underlying causes are almost certainly unrelated. Human framing effects arise from a specific cognitive architecture: loss aversion, reference-dependent value, limited attention, the way affect colours a description before deliberation begins. Model framing effects arise from token-level statistics: a differently worded prompt is a different point in input space, routed through attention to a different region of the learned function, with no reference point, no loss aversion, and no affect anywhere in the mechanism. The two systems land on the same behaviour from entirely different places.</p>
+            <p>This is why the fidelity is <span class="fid fid--metaphor">metaphor</span> and why that is not a demotion. The analogy is dangerous exactly when it is used to explain: to say a model "anchors because it is biased like people are" smuggles in a mechanism, reference-dependent judgement, that the model does not have, and it will lead you to predict the wrong interventions. Debiasing that works on humans, warnings, incentives, consider-the-opposite, has no reason to work on a model, and calibration methods that work on a model have no bearing on people.</p>
+            <p>But the analogy is productive exactly when it is used to generate. The human literature is a century-old, well-organised map of the places where context illegitimately moves a judgement. Read as a source of hypotheses, where to probe, what manipulation to try next, which brittleness to expect, it is one of the most useful inputs a model evaluator has. The discipline is to let it suggest experiments and never let it stand in for their explanation.</p>
+          </section>
+
+          <h2 id="implications"><span class="h2num" aria-hidden="true">06</span>Implications for prompt and agent design</h2>
+          <ul class="imp-list">
+            <li><b>Mine the bias catalogue for tests, not for theories.</b> Use anchoring, framing, order, and demand effects as a checklist of manipulations to run against your prompts and evals. Do not use them to explain why a model failed.</li>
+            <li><b>Measure prompt sensitivity as a first-class metric.</b> Report accuracy across paraphrases and formats, not a single prompt. A result that survives only one phrasing is a result about the phrasing.</li>
+            <li><b>Place critical facts at the ends, and calibrate order.</b> Given position bias, put must-use information early or late, and estimate and subtract few-shot ordering bias rather than hoping a lucky order holds.</li>
+            <li><b>Audit eval prompts for leaked expectations.</b> If the prompt signals the desired answer, an agreeable model will supply it. Strip demand characteristics before you trust the score.</li>
+          </ul>
+
+          <h2 id="open"><span class="h2num" aria-hidden="true">07</span>Open questions</h2>
+          <ul class="imp-list">
+            <li>The lost-in-the-middle curve and the human serial-position curve share a shape. Is that pure coincidence, an artefact of training data written by position-biased humans, or a deeper property of sequence processing?</li>
+            <li>Model biases can often be estimated and subtracted. Is there a general calibration that removes a whole class of prompt-induced bias, or must each be handled on its own?</li>
+            <li>If human and model context effects are mechanistically unrelated, is there any regime where the human debiasing toolkit does transfer, and how would we recognise it?</li>
+          </ul>
+
+          <h2 id="references"><span class="h2num" aria-hidden="true">08</span>References</h2>
+          <div class="refs">
+            <ol>
+              <li>Tversky, A. &amp; Kahneman, D. (1974). <cite>Judgment under uncertainty: heuristics and biases.</cite> Science, 185(4157), 1124–1131.</li>
+              <li>Tversky, A. &amp; Kahneman, D. (1981). <cite>The framing of decisions and the psychology of choice.</cite> Science, 211(4481), 453–458.</li>
+              <li>Meyer, D. E. &amp; Schvaneveldt, R. W. (1971). <cite>Facilitation in recognizing pairs of words: evidence of a dependence between retrieval operations.</cite> Journal of Experimental Psychology, 90(2), 227–234.</li>
+              <li>Sclar, M., Choi, Y., Tsvetkov, Y. &amp; Suhr, A. (2024). <cite>Quantifying language models' sensitivity to spurious features in prompt design.</cite> International Conference on Learning Representations.</li>
+              <li>Liu, N. F., et al. (2024). <cite>Lost in the middle: how language models use long contexts.</cite> Transactions of the Association for Computational Linguistics, 12.</li>
+              <li>Lu, Y., et al. (2022). <cite>Fantastically ordered prompts and where to find them: overcoming few-shot prompt order sensitivity.</cite> Association for Computational Linguistics.</li>
+              <li>Zhao, Z., et al. (2021). <cite>Calibrate before use: improving few-shot performance of language models.</cite> International Conference on Machine Learning.</li>
+              <li>Orne, M. T. (1962). <cite>On the social psychology of the psychological experiment: with particular reference to demand characteristics and their implications.</cite> American Psychologist, 17(11), 776–783.</li>
+            </ol>
+          </div>
+
+          <nav class="article-foot" aria-label="between essays">
+            <a href="reward-prediction-error.html">← prev · reward prediction error and actor-critic</a>
+            <a href="index.html">next · all research →</a>
+          </nav>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-foot">
+    <div class="site-foot__row">
+      <div class="site-foot__brand">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <p><span class="wordmark" style="font-size:1.2rem;">peplomer</span><br>Research at the seam between behavioral science, neuroscience, and machine learning. The name is a working title, swappable.</p>
+      </div>
+      <div>
+        <h3>read</h3>
+        <ul>
+          <li><a href="index.html">all research</a></li>
+          <li><a href="../about.html">about the method</a></li>
+          <li><a href="../index.html">home</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>the legend</h3>
+        <ul>
+          <li class="legend-key k-bio"><i></i> biological</li>
+          <li class="legend-key k-comp"><i></i> computational</li>
+          <li class="legend-key k-bridge"><i></i> the bridge</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-foot__legal">
+      <span>© 2026 peplomer. Text set in Fraunces, Newsreader, and IBM Plex Mono.</span>
+      <span>Built as a static site. No trackers.</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>

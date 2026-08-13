@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consolidation, replay, and agent memory architecture · peplomer</title>
+  <meta name="description" content="Hippocampal-to-neocortical consolidation and replay next to context windows, retrieval, and distillation. Why retrieval is not recall and nothing reconsolidates.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Consolidation, replay, and agent memory architecture">
+  <meta property="og:description" content="Hippocampal-to-neocortical consolidation and replay next to context windows, retrieval, and distillation. Why retrieval is not recall and nothing reconsolidates.">
+  <meta property="og:site_name" content="peplomer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,360;0,9..144,400;0,9..144,500;1,9..144,360&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="side-bio">
+  <a class="skip" href="#main">skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead__row">
+      <a class="brand" href="../index.html" aria-label="peplomer, home">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <span class="wordmark">peplomer</span>
+      </a>
+      <nav class="nav" aria-label="primary">
+        <a href="index.html">research</a>
+        <a href="../about.html">about</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <article>
+      <div class="wrap article-head">
+        <p class="eyebrow"><i aria-hidden="true"></i> biological · memory systems</p>
+        <h1>Consolidation, replay, and agent memory architecture</h1>
+        <p class="standfirst">The brain keeps a fast store and a slow one and moves experience between them while you sleep. Agent memory has the same layers, and one operation biology runs automatically that no vector store performs.</p>
+        <div class="byline">
+          <span>reading time · 15 min</span>
+          <span>last updated · 2026-08-13</span>
+          <span>central analogy · <span class="fid fid--analogy">analogy</span></span>
+        </div>
+      </div>
+
+      <div class="wrap article-grid">
+        <nav class="toc" data-toc aria-label="contents">
+          <h2>contents</h2>
+          <ol>
+            <li><a href="#two-stores">Two stores, one system</a></li>
+            <li><a href="#replay">Replay and consolidation</a></li>
+            <li><a href="#forgetting">Interference and forgetting</a></li>
+            <li><a href="#agent-memory">Agent memory in practice</a></li>
+            <li><a href="#table">Correspondence table</a></li>
+            <li><a href="#breaks">Where the mapping breaks</a></li>
+            <li><a href="#implications">Implications for design</a></li>
+            <li><a href="#open">Open questions</a></li>
+            <li><a href="#references">References</a></li>
+          </ol>
+        </nav>
+
+        <div class="prose">
+          <div class="abstract">
+            <span class="label">abstract</span>
+            <p>Biological memory is not one store but a division of labour: a fast hippocampal system that binds new episodes, and a slow neocortical system that integrates them over time, with sleep replay ferrying experience between the two. Agent memory has its own layers: the context window, a vector store for retrieval, episodic scratchpads, summarization, and offline distillation from trajectories. The layered structure rhymes. But retrieval is not recall, and nothing in a vector store is reconsolidated on access the way a biological memory is. The central analogy holds at <span class="fid fid--analogy">analogy</span>.</p>
+          </div>
+
+          <h2 id="two-stores"><span class="h2num" aria-hidden="true">01</span>Two stores, one system</h2>
+          <p>The dominant account of human long-term memory is the <span class="term" tabindex="0">complementary learning systems<span class="term__def">The theory that the brain uses a fast-learning hippocampus and a slow-learning neocortex together, so new memories can be acquired quickly without overwriting old knowledge.</span></span> theory of McClelland, McNaughton and O'Reilly <a class="ref" href="#references">1</a>. The hippocampus learns fast, binding the elements of a single experience into an episode after one exposure. The neocortex learns slowly, extracting statistical structure across many experiences. The split solves a real engineering problem: fast learning that overwrites is unstable, and slow learning alone cannot capture a one-time event. Keep both, and you get rapid acquisition without catastrophic overwriting.</p>
+          <p>An agent stack has a comparable separation, though it arrived by convenience rather than design. The context window is a fast, high-fidelity, short-lived store: everything in it is available at full resolution, and all of it vanishes when the session ends. The model weights are a slow store: they change only through training and hold structure distilled across the whole corpus. Between them sit external memories, vector databases, files, scratchpads, that persist across sessions without touching the weights. The three-tier arrangement, fast and volatile, slow and stable, plus a persistent external tier, is the practical shape of agent memory today.</p>
+
+          <h2 id="replay"><span class="h2num" aria-hidden="true">02</span>Replay and consolidation</h2>
+          <p>What moves a memory from the fast store to the slow one is <span class="term" tabindex="0">consolidation<span class="term__def">The process by which a labile new memory becomes stable and integrated into long-term neocortical storage, much of it during sleep.</span></span>, and its signature mechanism is replay. Wilson and McNaughton recorded hippocampal place cells reactivating during sleep in the same sequences they had fired during waking experience <a class="ref" href="#references">2</a>. During <span class="term" tabindex="0">sharp-wave ripples<span class="term__def">Brief high-frequency bursts of hippocampal activity, prominent in rest and sleep, during which waking experience is replayed in compressed form.</span></span>, the day's trajectories are replayed in compressed form, and this offline reactivation is thought to train the neocortex gradually, interleaving new episodes with old knowledge so the slow store integrates them without disruption <a class="ref" href="#references">3</a>.</p>
+          <p>Machine learning independently discovered the value of replay. Experience replay in deep reinforcement learning stores transitions in a buffer and samples them repeatedly to train the network, breaking correlations and reusing rare experiences; it was central to the first deep agent to reach human-level play across Atari games <a class="ref" href="#references">4</a>. For language agents, the offline analogue is distillation from trajectories: collect the traces of an agent solving tasks, filter for the successful ones, and fine-tune on them so that behaviour which required a long deliberate rollout becomes available in a single pass. That is consolidation in spirit, slow structure absorbing what fast processing produced.</p>
+
+          <figure class="fig">
+            <div class="fig__frame">
+              <svg viewBox="0 0 640 250" role="img" aria-labelledby="fig3-title fig3-desc">
+                <title id="fig3-title">Fast store, slow store, and the replay path</title>
+                <desc id="fig3-desc">A fast volatile store on the left, a slow stable store on the right, and a replay arrow moving compressed experience from fast to slow, with an external persistent tier below.</desc>
+                <g font-family="IBM Plex Mono, monospace" font-size="12">
+                  <rect x="40" y="40" width="200" height="70" rx="4" fill="rgba(157,191,224,.14)" stroke="#9DBFE0"/>
+                  <text x="140" y="70" text-anchor="middle" fill="#1B1B22">fast store</text>
+                  <text x="140" y="90" text-anchor="middle" fill="#6C6C74">hippocampus · context</text>
+                  <rect x="400" y="40" width="200" height="70" rx="4" fill="rgba(157,191,224,.14)" stroke="#35597F"/>
+                  <text x="500" y="70" text-anchor="middle" fill="#1B1B22">slow store</text>
+                  <text x="500" y="90" text-anchor="middle" fill="#6C6C74">neocortex · weights</text>
+                  <path d="M245 75 H395" fill="none" stroke="#7A5E10" stroke-width="2.5" marker-end="url(#a3)"/>
+                  <text x="320" y="65" text-anchor="middle" fill="#7A5E10">replay · distillation</text>
+                  <rect x="180" y="160" width="280" height="56" rx="4" fill="var(--surface)" stroke="#BFBEB6" stroke-dasharray="4 4"/>
+                  <text x="320" y="184" text-anchor="middle" fill="#1B1B22">external persistent tier</text>
+                  <text x="320" y="203" text-anchor="middle" fill="#6C6C74">vector store · files · scratchpad</text>
+                  <path d="M140 110 V188 H176" fill="none" stroke="#BFBEB6" stroke-width="1.4"/>
+                  <path d="M500 110 V188 H464" fill="none" stroke="#BFBEB6" stroke-width="1.4"/>
+                </g>
+                <defs><marker id="a3" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#7A5E10" stroke-width="2"/></marker></defs>
+              </svg>
+            </div>
+            <figcaption><b>Figure 1.</b> The layered picture. Replay carries compressed experience from the fast store to the slow one in both biology and reinforcement learning. The external tier, persistent but outside the weights, has no clean biological counterpart.</figcaption>
+          </figure>
+
+          <h2 id="forgetting"><span class="h2num" aria-hidden="true">03</span>Interference and forgetting</h2>
+          <p>Forgetting is not a bug the brain failed to fix; it is the shape of a finite system under interference. Ebbinghaus measured the forgetting curve on himself over a century ago, and its steep early drop followed by a long tail has held up <a class="ref" href="#references">5</a>. New learning interferes with old, and old with new, which is exactly the pressure complementary learning systems evolved to manage.</p>
+          <p>Neural networks have their own, harsher version. McCloskey and Cohen named <span class="term" tabindex="0">catastrophic interference<span class="term__def">The tendency of a neural network to abruptly lose previously learned information when trained on new data, because the same weights encode both.</span></span>: train a network on task B and it can lose task A almost entirely, because the same weights carry both and gradient descent has no reason to protect the old <a class="ref" href="#references">6</a>. Interleaved replay is one of the standard defences, which is part of why the biological solution and the engineering solution converge on the same move: do not learn new things in isolation, rehearse them alongside the old.</p>
+          <p>For a language agent, the interference lives at a different layer. The weights are frozen during deployment, so the catastrophic case does not arise per session. Instead the pressure shows up in the context: finite window, so older turns are dropped or summarized, and in retrieval, where a growing store makes the relevant memory harder to surface. The failure mode is not overwriting but crowding and mis-retrieval.</p>
+
+          <div class="pullquote">Forgetting is the shape of a finite system under interference, not a defect it failed to fix.</div>
+
+          <h2 id="agent-memory"><span class="h2num" aria-hidden="true">04</span>Agent memory in practice</h2>
+          <p>The working toolkit is small and worth naming precisely. Retrieval-augmented generation fetches passages by similarity and places them in context, the pattern Lewis and colleagues formalised <a class="ref" href="#references">7</a>. Episodic scratchpads let an agent write notes to itself across steps. Summarization and compaction compress old context into shorter form to fit the window. Offline distillation turns successful trajectories into weight updates. Each of these is a memory operation, and each has a loose biological echo: retrieval as cued recall, scratchpads as working memory held externally, summarization as gist extraction, distillation as consolidation.</p>
+          <p>The echoes are useful for design intuition. Sleep research suggests that consolidation is selective, that salient and rewarded experiences are preferentially replayed <a class="ref" href="#references">8</a>. An agent that distills every trajectory equally is ignoring that lesson; one that weights replay toward informative or successful episodes is closer to how the biological system spends its offline budget. The analogy pays off precisely where it suggests a policy you would not otherwise have written down.</p>
+
+          <h2 id="table"><span class="h2num" aria-hidden="true">05</span>Correspondence table</h2>
+          <div class="corr-table-wrap">
+            <span class="label">the mapping, rated</span>
+            <table class="ctable">
+              <thead>
+                <tr><th class="col-bio" scope="col">Neuroscience</th><th class="col-comp" scope="col">Machine learning</th><th scope="col">Fidelity</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="c-bio" data-th="Neuroscience">Hippocampus, fast one-shot store</td><td class="c-comp" data-th="Machine learning">Context window</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Neocortex, slow integrated store</td><td class="c-comp" data-th="Machine learning">Model weights</td><td data-th="Fidelity"><span class="fid fid--analogy">analogy</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Sharp-wave ripple replay</td><td class="c-comp" data-th="Machine learning">Experience replay / trajectory distillation</td><td data-th="Fidelity"><span class="fid fid--mechanism">mechanism</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Cued recall</td><td class="c-comp" data-th="Machine learning">Vector retrieval</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+                <tr><td class="c-bio" data-th="Neuroscience">Reconsolidation on retrieval</td><td class="c-comp" data-th="Machine learning">(no counterpart)</td><td data-th="Fidelity"><span class="fid fid--metaphor">metaphor</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <section class="breaks" aria-labelledby="breaks">
+            <p class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="18" r=".6" fill="currentColor" stroke="none"/></svg> where the mapping breaks</p>
+            <h3 id="breaks">Retrieval is not recall, and nothing reconsolidates</h3>
+            <p>A vector store returns the stored item unchanged. You embed a query, find the nearest neighbours, and hand back the passages exactly as they were written. Biological recall does no such thing. Retrieving a memory reactivates it, and reactivation opens a window in which the memory becomes labile and must be restabilised, often in altered form. Nader, Schafe and LeDoux showed that a consolidated fear memory, once recalled, requires new protein synthesis to persist, and can be disrupted or changed during that window <a class="ref" href="#references">9</a>. This is <span class="term" tabindex="0">reconsolidation<span class="term__def">The finding that recalling a memory returns it to an unstable state, requiring restorage, during which it can be updated, strengthened, or impaired.</span></span>, and it means a human memory is edited a little every time it is used.</p>
+            <p>Nothing in the standard agent stack does this. Reading a passage from a vector store leaves it byte-for-byte identical; accessing it a thousand times changes nothing about what is stored. The store is a filing cabinet, not a living trace. That difference is not a detail. Human memory's fallibility and its adaptiveness are the same property: memories drift toward coherence, absorb new context, and update on use. A retrieval system that never reconsolidates is more faithful and less intelligent, holding stale facts perfectly while a person would have quietly revised them.</p>
+            <p>A second break: consolidation in biology is a physical transfer between distinct anatomical systems with different learning rates. In an agent, the "transfer" from context to weights only happens if an engineer runs a training job. Absent that, the fast store never becomes the slow store; the session ends and the episode is gone unless it was written to the external tier. The layered diagram looks the same, but one version runs the pumps automatically and the other waits for a human to start them.</p>
+          </section>
+
+          <h2 id="implications"><span class="h2num" aria-hidden="true">06</span>Implications for prompt and agent design</h2>
+          <ul class="imp-list">
+            <li><b>Replay selectively, not uniformly.</b> Distill from trajectories weighted by success and information gain, the way sleep preferentially replays salient experience. Consolidating everything wastes the budget and dilutes the signal.</li>
+            <li><b>Treat retrieval as inert and design around it.</b> Since a store does not revise on access, build explicit update paths: version facts, timestamp them, and expire the stale. Do not assume the system will quietly correct itself the way a memory would.</li>
+            <li><b>Interleave when you fine-tune.</b> If you update weights on new behaviour, mix in old data to blunt catastrophic interference. The biological system never learns the new in isolation, and neither should yours.</li>
+            <li><b>Compact with gist, keep the source.</b> Summarization is gist extraction; it loses detail. Keep a pointer to the full episode so a later step can recover specifics the summary dropped.</li>
+          </ul>
+
+          <h2 id="open"><span class="h2num" aria-hidden="true">07</span>Open questions</h2>
+          <ul class="imp-list">
+            <li>Would a retrieval system that deliberately reconsolidated, rewriting stored memories toward coherence on access, be more useful, or would it inherit the same distortions that make human memory unreliable?</li>
+            <li>What is the right trigger for moving an agent's fast-store experience into the slow store, and can it be learned rather than scheduled by hand?</li>
+            <li>Is there a principled forgetting curve for an external memory, a policy for what to drop that improves retrieval rather than merely saving space?</li>
+          </ul>
+
+          <h2 id="references"><span class="h2num" aria-hidden="true">08</span>References</h2>
+          <div class="refs">
+            <ol>
+              <li>McClelland, J. L., McNaughton, B. L. &amp; O'Reilly, R. C. (1995). <cite>Why there are complementary learning systems in the hippocampus and neocortex: insights from the successes and failures of connectionist models of learning and memory.</cite> Psychological Review, 102(3), 419–457.</li>
+              <li>Wilson, M. A. &amp; McNaughton, B. L. (1994). <cite>Reactivation of hippocampal ensemble memories during sleep.</cite> Science, 265(5172), 676–679.</li>
+              <li>Diekelmann, S. &amp; Born, J. (2010). <cite>The memory function of sleep.</cite> Nature Reviews Neuroscience, 11(2), 114–126.</li>
+              <li>Mnih, V., et al. (2015). <cite>Human-level control through deep reinforcement learning.</cite> Nature, 518(7540), 529–533.</li>
+              <li>Ebbinghaus, H. (1885). <cite>Memory: A Contribution to Experimental Psychology.</cite> Duncker &amp; Humblot.</li>
+              <li>McCloskey, M. &amp; Cohen, N. J. (1989). <cite>Catastrophic interference in connectionist networks: the sequential learning problem.</cite> Psychology of Learning and Motivation, 24, 109–165.</li>
+              <li>Lewis, P., et al. (2020). <cite>Retrieval-augmented generation for knowledge-intensive NLP tasks.</cite> Advances in Neural Information Processing Systems, 33.</li>
+              <li>Born, J. &amp; Wilhelm, I. (2012). <cite>System consolidation of memory during sleep.</cite> Psychological Research, 76(2), 192–203.</li>
+              <li>Nader, K., Schafe, G. E. &amp; LeDoux, J. E. (2000). <cite>Fear memories require protein synthesis in the amygdala for reconsolidation after retrieval.</cite> Nature, 406(6797), 722–726.</li>
+            </ol>
+          </div>
+
+          <nav class="article-foot" aria-label="between essays">
+            <a href="dual-process-reasoning.html">← prev · dual-process theory and the reasoning trace</a>
+            <a href="reward-prediction-error.html">next · reward prediction error and actor-critic →</a>
+          </nav>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-foot">
+    <div class="site-foot__row">
+      <div class="site-foot__brand">
+        <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+          <g fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="32" cy="32" r="11" fill="none"/><circle cx="32" cy="32" r="4" stroke="none"/>
+            <line x1="32" y1="18.5" x2="32" y2="9.1"/><circle cx="32" cy="6" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="20.31" x2="43.45" y2="12.17"/><circle cx="45" cy="9.48" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="25.25" x2="51.83" y2="20.55"/><circle cx="54.52" cy="19" r="2.6" stroke="none"/>
+            <line x1="45.5" y1="32" x2="54.9" y2="32"/><circle cx="58" cy="32" r="2.6" stroke="none"/>
+            <line x1="43.69" y1="38.75" x2="51.83" y2="43.45"/><circle cx="54.52" cy="45" r="2.6" stroke="none"/>
+            <line x1="38.75" y1="43.69" x2="43.45" y2="51.83"/><circle cx="45" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="32" y1="45.5" x2="32" y2="54.9"/><circle cx="32" cy="58" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="43.69" x2="20.55" y2="51.83"/><circle cx="19" cy="54.52" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="38.75" x2="12.17" y2="43.45"/><circle cx="9.48" cy="45" r="2.6" stroke="none"/>
+            <line x1="18.5" y1="32" x2="9.1" y2="32"/><circle cx="6" cy="32" r="2.6" stroke="none"/>
+            <line x1="20.31" y1="25.25" x2="12.17" y2="20.55"/><circle cx="9.48" cy="19" r="2.6" stroke="none"/>
+            <line x1="25.25" y1="20.31" x2="20.55" y2="12.17"/><circle cx="19" cy="9.48" r="2.6" stroke="none"/>
+          </g>
+        </svg>
+        <p><span class="wordmark" style="font-size:1.2rem;">peplomer</span><br>Research at the seam between behavioral science, neuroscience, and machine learning. The name is a working title, swappable.</p>
+      </div>
+      <div>
+        <h3>read</h3>
+        <ul>
+          <li><a href="index.html">all research</a></li>
+          <li><a href="../about.html">about the method</a></li>
+          <li><a href="../index.html">home</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>the legend</h3>
+        <ul>
+          <li class="legend-key k-bio"><i></i> biological</li>
+          <li class="legend-key k-comp"><i></i> computational</li>
+          <li class="legend-key k-bridge"><i></i> the bridge</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-foot__legal">
+      <span>© 2026 peplomer. Text set in Fraunces, Newsreader, and IBM Plex Mono.</span>
+      <span>Built as a static site. No trackers.</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>
