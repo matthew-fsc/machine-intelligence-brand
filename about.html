@@ -7,10 +7,13 @@
   <meta name="description" content="The method behind peplomer: a fixed accent legend, a fidelity rating on every analogy, and a required section in every essay stating where the mapping breaks.">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate" type="application/rss+xml" title="peplomer" href="feed.xml">
   <meta property="og:type" content="website">
   <meta property="og:title" content="about · peplomer">
   <meta property="og:description" content="One structural device, held site-wide: blue is biological, red is computational, yellow is a claimed correspondence.">
   <meta property="og:site_name" content="peplomer">
+  <meta property="og:image" content="https://matthew-fsc.github.io/machine-intelligence-brand/assets/og/default.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,360;0,9..144,400;0,9..144,500;1,9..144,360&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -43,6 +46,8 @@
       </a>
       <nav class="nav" aria-label="primary">
         <a href="research/index.html">research</a>
+        <a href="atlas.html">atlas</a>
+        <a href="search.html">search</a>
         <a href="about.html" aria-current="page">about</a>
       </nav>
     </div>
@@ -108,6 +113,13 @@
           </ol>
         </div>
         <p>Swapping the name is a one-line change: replace the wordmark text in each page header and footer, and the favicon needs no edit since the mark stands on its own.</p>
+
+        <h2>Depth</h2>
+        <p>Pieces come at three depths, tagged so you can pick the level you want. Primers hand you a mental model in a few minutes with no mathematics. Core essays make the full argument, with figures and references. A deep dive is the most technical tier. Start with the primers if the subject is new to you.</p>
+
+        <h2>Editorial status</h2>
+        <p>Read this before you cite anything here. The essays are working drafts under active review, not peer-reviewed papers. References cite real, well-established work by author, year, and title, and link to a stable source where one exists. If you find a claim that overreaches or a citation that is wrong, that is exactly the kind of correction this site wants: open an issue on the <a class="ref" href="https://github.com/matthew-fsc/machine-intelligence-brand">source repository</a>. Every piece already states where its own central analogy breaks; the goal is to hold the prose to that same standard everywhere.</p>
+        <p>The prose is licensed CC BY 4.0, so you may share and adapt it with attribution. The code is separate.</p>
 
         <h2>How it is built</h2>
         <p>A static site: plain HTML, one stylesheet, a small file of vanilla JavaScript, and no build step. Every diagram is inline, hand-written SVG that carries information rather than decoration. Fonts are Fraunces for display, Newsreader for reading, and IBM Plex Mono for data and labels. It opens by double-clicking a file, respects reduced-motion preferences, and keeps its focus rings visible. There are no trackers and no third-party dependencies beyond the fonts.</p>
