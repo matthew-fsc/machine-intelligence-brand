@@ -121,4 +121,121 @@
   } else {
     reveals.forEach(function (el) { el.classList.add("in"); });
   }
+
+  /* -- 5. Atlas: search + fidelity + side filter -------------------------- */
+  var atlas = document.querySelector("[data-atlas]");
+  if (atlas) {
+    var rows = atlas.querySelectorAll("[data-row]");
+    var aSearch = document.querySelector("[data-atlas-search]");
+    var aCount = document.querySelector("[data-atlas-count]");
+    var aEmpty = document.querySelector("[data-atlas-empty]");
+    var fidBtns = document.querySelectorAll("button[data-fid]");
+    var sideBtns = document.querySelectorAll("button[data-side]");
+    var aState = { q: "", fid: "all", side: "all" };
+    function atlasApply() {
+      var shown = 0;
+      rows.forEach(function (r) {
+        var okQ = !aState.q || r.getAttribute("data-text").indexOf(aState.q) !== -1;
+        var okF = aState.fid === "all" || r.getAttribute("data-fid") === aState.fid;
+        var okS = aState.side === "all" || r.getAttribute("data-side") === aState.side;
+        var match = okQ && okF && okS;
+        r.hidden = !match;
+        if (match) shown++;
+      });
+      fidBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-fid") === aState.fid)); });
+      sideBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-side") === aState.side)); });
+      if (aCount) aCount.textContent = shown + " of " + rows.length;
+      if (aEmpty) aEmpty.classList.toggle("on", shown === 0);
+    }
+    if (aSearch) aSearch.addEventListener("input", function () { aState.q = aSearch.value.trim().toLowerCase(); atlasApply(); });
+    fidBtns.forEach(function (b) { b.addEventListener("click", function () { aState.fid = b.getAttribute("data-fid"); atlasApply(); }); });
+    sideBtns.forEach(function (b) { b.addEventListener("click", function () { aState.side = b.getAttribute("data-side"); atlasApply(); }); });
+    atlasApply();
+  }
+
+  /* -- 6. Search: over an inlined index (works from the filesystem) -------- */
+  var searchInput = document.querySelector("[data-search-input]");
+  var searchData = document.getElementById("search-data");
+  if (searchInput && searchData) {
+    var docs = [];
+    try { docs = JSON.parse(searchData.textContent); } catch (e) { docs = []; }
+    var out = document.querySelector("[data-search-results]");
+    var sCount = document.querySelector("[data-search-count]");
+    var sEmpty = document.querySelector("[data-search-empty]");
+    var depthLabel = { primer: "primer", core: "core", deep: "deep dive" };
+    function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function snippet(text, terms) {
+      var i = -1;
+      for (var t = 0; t < terms.length; t++) { var p = text.indexOf(terms[t]); if (p !== -1 && (i === -1 || p < i)) i = p; }
+      if (i === -1) i = 0;
+      var start = Math.max(0, i - 60);
+      var frag = (start > 0 ? "\u2026" : "") + text.slice(start, start + 200) + "\u2026";
+      terms.forEach(function (t) {
+        if (!t) return;
+        frag = frag.replace(new RegExp("(" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig"), "\u0001$1\u0002");
+      });
+      return esc(frag).replace(/\u0001/g, "<mark>").replace(/\u0002/g, "</mark>");
+    }
+    function runSearch() {
+      var q = searchInput.value.trim().toLowerCase();
+      if (!q) { out.innerHTML = ""; if (sCount) sCount.textContent = ""; if (sEmpty) sEmpty.classList.remove("on"); return; }
+      var terms = q.split(/\s+/).filter(Boolean);
+      var scored = [];
+      docs.forEach(function (d) {
+        var score = 0;
+        terms.forEach(function (t) {
+          if (d.title.toLowerCase().indexOf(t) !== -1) score += 10;
+          var m = d.text.split(t).length - 1;
+          score += m;
+        });
+        if (score > 0) scored.push({ d: d, score: score });
+      });
+      scored.sort(function (a, b) { return b.score - a.score; });
+      if (sCount) sCount.textContent = scored.length + (scored.length === 1 ? " result" : " results");
+      if (sEmpty) sEmpty.classList.toggle("on", scored.length === 0);
+      out.innerHTML = scored.map(function (s) {
+        var d = s.d;
+        return '<a class="result" href="' + d.url + '">'
+          + '<span class="result__eyebrow"><span>' + esc(d.kicker) + '</span><span>' + d.mins + ' min</span>'
+          + '<span class="depth depth--' + d.depth + '"><span class="depth__meter" aria-hidden="true"><i></i><i></i><i></i></span> ' + depthLabel[d.depth] + '</span></span>'
+          + '<span class="result__title">' + esc(d.title) + '</span>'
+          + '<span class="result__snippet">' + snippet(d.text, terms) + '</span></a>';
+      }).join("");
+    }
+    searchInput.addEventListener("input", runSearch);
+    // allow ?q= deep links
+    var qp = new URLSearchParams(location.search).get("q");
+    if (qp) { searchInput.value = qp; runSearch(); }
+  }
+
+  /* -- 7. Glossary filter ------------------------------------------------- */
+  var glossaryFilter = document.querySelector("[data-glossary-filter]");
+  if (glossaryFilter) {
+    var dts = document.querySelectorAll(".glossary dt");
+    var gCount = document.querySelector("[data-glossary-count]");
+    var gEmpty = document.querySelector("[data-glossary-empty]");
+    glossaryFilter.addEventListener("input", function () {
+      var q = glossaryFilter.value.trim().toLowerCase();
+      var shown = 0;
+      dts.forEach(function (dt) {
+        var dd = dt.nextElementSibling;
+        var text = (dt.textContent + " " + (dd ? dd.textContent : "")).toLowerCase();
+        var match = !q || text.indexOf(q) !== -1;
+        dt.hidden = !match; if (dd) dd.hidden = !match;
+        if (match) shown++;
+      });
+      if (gCount) gCount.textContent = shown + " term" + (shown === 1 ? "" : "s");
+      if (gEmpty) gEmpty.classList.toggle("on", shown === 0);
+    });
+  }
+
+  /* -- 8. Subscribe guard: no backend wired yet --------------------------- */
+  var subForm = document.querySelector("[data-subscribe]");
+  if (subForm && subForm.getAttribute("action") === "#") {
+    subForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var note = document.querySelector("[data-subscribe-note]");
+      if (note) { note.textContent = "Email is not connected yet. Grab the RSS feed above, and this form will work once a provider is wired in."; note.style.color = "var(--red-ink)"; }
+    });
+  }
 })();

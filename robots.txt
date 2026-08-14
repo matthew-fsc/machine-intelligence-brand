@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://matthew-fsc.github.io/machine-intelligence-brand/sitemap.xml
